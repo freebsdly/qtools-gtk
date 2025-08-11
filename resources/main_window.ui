@@ -1,109 +1,105 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.96.1 -->
 <interface>
+  <!-- interface-name main_window.ui -->
+  <requires lib="gio" version="2.0"/>
+  <requires lib="gtk" version="4.18"/>
+  <requires lib="libadwaita" version="1.7"/>
   <menu id="main-menu">
     <submenu>
       <attribute name="label" translatable="yes">_Filter</attribute>
       <item>
-        <attribute name="label" translatable="yes">_All</attribute>
         <attribute name="action">win.filter</attribute>
+        <attribute name="label" translatable="yes">_All</attribute>
         <attribute name="target">All</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">_Open</attribute>
         <attribute name="action">win.filter</attribute>
+        <attribute name="label" translatable="yes">_Open</attribute>
         <attribute name="target">Open</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">_Done</attribute>
         <attribute name="action">win.filter</attribute>
+        <attribute name="label" translatable="yes">_Done</attribute>
         <attribute name="target">Done</attribute>
       </item>
     </submenu>
     <item>
-      <attribute name="label" translatable="yes">_Remove Done Tasks</attribute>
       <attribute name="action">win.remove-done-tasks</attribute>
+      <attribute name="label" translatable="yes">_Remove Done Tasks</attribute>
     </item>
     <item>
-      <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
       <attribute name="action">win.show-help-overlay</attribute>
+      <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
     </item>
   </menu>
   <template class="QToolAppWindow" parent="AdwApplicationWindow">
-    <property name="title" translatable="yes">QTools</property>
-    <property name="width-request">800</property>
-    <property name="height-request">600</property>
-    <child>
-      <object class="AdwBreakpoint">
-        <condition>max-width: 500sp</condition>
-        <setter object="split_view" property="collapsed">True</setter>
-      </object>
-    </child>
     <property name="content">
       <object class="GtkStack" id="stack">
         <property name="transition-type">crossfade</property>
         <child>
           <object class="GtkStackPage">
-            <property name="name">placeholder</property>
-            <property name="child">
-              <object class="GtkBox">
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkHeaderBar">
-                    <style>
-                      <class name="flat"/>
-                    </style>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkWindowHandle">
-                    <property name="child">
-                      <object class="AdwStatusPage">
-                        <property name="icon-name">checkbox-checked-symbolic</property>
-                        <property name="title" translatable="yes">No Tasks</property>
-                        <property name="description" translatable="yes">Create some tasks to start using the app.
-                        </property>
-                        <property name="child">
-                          <object class="GtkButton">
-                            <property name="label" translatable="yes">_New Collection</property>
-                            <property name="use-underline">True</property>
-                            <property name="halign">center</property>
-                            <property name="action-name">win.new-collection</property>
-                            <style>
-                              <class name="pill"/>
-                              <class name="suggested-action"/>
-                            </style>
-                          </object>
-                        </property>
-                      </object>
-                    </property>
-                  </object>
-                </child>
-              </object>
-            </property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkStackPage">
-            <property name="name">main</property>
             <property name="child">
               <object class="AdwNavigationSplitView" id="split_view">
-                <property name="min-sidebar-width">200</property>
-                <property name="sidebar">
+                <property name="content">
                   <object class="AdwNavigationPage">
-                    <property name="title" bind-source="QToolAppWindow" bind-property="title" bind-flags="sync-create"/>
                     <property name="child">
                       <object class="AdwToolbarView">
+                        <property name="content">
+                          <object class="GtkScrolledWindow">
+                            <property name="child">
+                              <object class="AdwClamp">
+                                <property name="child">
+                                  <object class="GtkBox">
+                                    <property name="margin-end">12</property>
+                                    <property name="margin-start">12</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="spacing">12</property>
+                                    <child>
+                                      <object class="GtkEntry" id="entry">
+                                        <property name="placeholder-text" translatable="yes">Enter a Task…</property>
+                                        <property name="secondary-icon-name">list-add-symbolic</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkListBox" id="tasks_list">
+                                        <property name="selection-mode">none</property>
+                                        <property name="visible">False</property>
+                                        <style>
+                                          <class name="boxed-list"/>
+                                        </style>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </property>
+                                <property name="maximum-size">400</property>
+                                <property name="tightening-threshold">300</property>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
                         <child type="top">
                           <object class="AdwHeaderBar">
-                            <child type="start">
-                              <object class="GtkToggleButton">
-                                <property name="icon-name">list-add-symbolic</property>
-                                <property name="tooltip-text" translatable="yes">New Collection</property>
-                                <property name="action-name">win.new-collection</property>
+                            <property name="show-title">False</property>
+                            <child type="end">
+                              <object class="GtkMenuButton">
+                                <property name="icon-name">open-menu-symbolic</property>
+                                <property name="menu-model">main-menu</property>
+                                <property name="tooltip-text" translatable="yes">Main Menu</property>
                               </object>
                             </child>
                           </object>
                         </child>
+                      </object>
+                    </property>
+                    <property name="title" translatable="yes">Tasks</property>
+                  </object>
+                </property>
+                <property name="min-sidebar-width">200</property>
+                <property name="sidebar">
+                  <object class="AdwNavigationPage">
+                    <property name="child">
+                      <object class="AdwToolbarView">
                         <property name="content">
                           <object class="GtkScrolledWindow">
                             <property name="child">
@@ -115,74 +111,47 @@
                             </property>
                           </object>
                         </property>
-                      </object>
-                    </property>
-                  </object>
-                </property>
-                <property name="content">
-                  <object class="AdwNavigationPage">
-                    <property name="title" translatable="yes">Tasks</property>
-                    <property name="child">
-                      <object class="AdwToolbarView">
                         <child type="top">
                           <object class="AdwHeaderBar">
-                            <property name="show-title">False</property>
+                            <child type="start">
+                              <object class="GtkToggleButton">
+                                <property name="action-name">win.new-collection</property>
+                                <property name="icon-name">list-add-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">New Collection</property>
+                              </object>
+                            </child>
                             <child type="end">
-                              <object class="GtkMenuButton">
-                                <property name="icon-name">open-menu-symbolic</property>
-                                <property name="menu-model">main-menu</property>
-                                <property name="tooltip-text" translatable="yes">Main
-                                  Menu
-                                </property>
+                              <object class="GtkToggleButton" id="collapse_button">
+                                <property name="icon-name">go-previous-symbolic</property>
+                                <property name="action-name">win.collapse-sidebar</property>
+                                <property name="tooltip-text" translatable="yes">Collapse</property>
+                                <!-- 添加绑定属性 -->
+                                <property name="active" bind-source="split_view" bind-property="collapsed" bind-flags="bidirectional|sync-create"/>
                               </object>
                             </child>
                           </object>
                         </child>
-                        <property name="content">
-                          <object class="GtkScrolledWindow">
-                            <property name="child">
-                              <object class="AdwClamp">
-                                <property name="maximum-size">400</property>
-                                <property name="tightening-threshold">300</property>
-                                <property name="child">
-                                  <object class="GtkBox">
-                                    <property name="orientation">vertical</property>
-                                    <property name="margin-start">12</property>
-                                    <property name="margin-end">12</property>
-                                    <property name="spacing">12</property>
-                                    <child>
-                                      <object class="GtkEntry" id="entry">
-                                        <property name="placeholder-text" translatable="yes">Enter a Task…</property>
-                                        <property name="secondary-icon-name">
-                                          list-add-symbolic
-                                        </property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkListBox" id="tasks_list">
-                                        <property name="visible">False</property>
-                                        <property name="selection-mode">none</property>
-                                        <style>
-                                          <class name="boxed-list"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </property>
-                              </object>
-                            </property>
-                          </object>
-                        </property>
                       </object>
                     </property>
+                    <property name="title" bind-source="QToolAppWindow" bind-property="title" bind-flags="sync-create"/>
                   </object>
                 </property>
               </object>
             </property>
+            <property name="name">main</property>
           </object>
         </child>
       </object>
     </property>
+    <property name="height-request">600</property>
+    <property name="title" translatable="yes">QTools</property>
+    <property name="width-request">800</property>
+    <child>
+      <object class="AdwBreakpoint">
+        <!-- Custom object fragments -->
+        <condition>max-width: 500sp</condition>
+        <setter object="split_view" property="collapsed">True</setter>
+      </object>
+    </child>
   </template>
 </interface>
-
