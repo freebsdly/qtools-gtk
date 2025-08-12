@@ -24,10 +24,10 @@ impl Window {
             .expect("`settings` should not be set before calling `setup_settings`.");
     }
 
-    fn settings(&self) -> &Settings {
-        self.imp()
-            .settings
-            .get()
-            .expect("`settings` should be set in `setup_settings`.")
-    }
+    // fn settings(&self) -> &Settings {
+    //     self.imp()
+    //         .settings
+    //         .get()
+    //         .expect("`settings` should be set in `setup_settings`.")
+    // }
 }
