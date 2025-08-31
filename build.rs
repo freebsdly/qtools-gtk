@@ -3,11 +3,16 @@ use anyhow;
 use std::env;
 use std::path::Path;
 use std::process::Command;
+
+const RESOURCES_DIR: &str = "resources";
+const GRESOURCE_FILE: &str = "resources/gresource.xml";
+const GRESOURCE_TARGET: &str = "app.gresource";
+const GSETTINGS_SCHEMA_DIR_KEY: &str = "GSETTINGS_SCHEMA_DIR";
 fn main() -> Result<(), anyhow::Error> {
     // 扫描src目录下的所有blp文件
     let src_dir = Path::new("src");
     let manifest_dir = env::var("CARGO_MANIFEST_DIR")?;
-    let schema_dir = Path::new(&manifest_dir).join("resources");
+    let schema_dir = Path::new(&manifest_dir).join(RESOURCES_DIR);
     let vec = scan_blp_files(&src_dir);
 
     // 编译blp文件到resources目录
@@ -16,15 +21,14 @@ fn main() -> Result<(), anyhow::Error> {
         compile_blp_to_xml(blp_file, &schema_dir).expect("Failed to compile blp file");
     });
 
-    glib_build_tools::compile_resources(&["resources"], "resources/gresource.xml", "app.gresource");
-
-    if env::var("DOCS_RS").is_ok() {}
+    glib_build_tools::compile_resources(&[RESOURCES_DIR], GRESOURCE_FILE, GRESOURCE_TARGET);
 
     validate_schemas(&schema_dir);
     compile_schemas(&schema_dir);
 
     println!(
-        "cargo:rustc-env=GSETTINGS_SCHEMA_DIR={}",
+        "cargo:rustc-env={}={}",
+        GSETTINGS_SCHEMA_DIR_KEY,
         schema_dir.display()
     );
     println!("cargo:rerun-if-changed=schemas/");
