@@ -5,16 +5,17 @@ use adw::subclass::prelude::*;
 use gtk::{Button, CompositeTemplate};
 use glib::subclass::InitializingObject;
 use gtk::prelude::ButtonExt;
-use crate::main_window::Window;
 
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/top/qinhuajun/app/main_window.ui")]
 pub struct QToolAppWindow {
     pub settings: OnceCell<Settings>,
-    #[template_child]
-    pub greet_button: TemplateChild<Button>,
-    #[template_child]
-    pub clear_button: TemplateChild<Button>,
+    // #[template_child]
+    // pub header_bar: TemplateChild<adw::HeaderBar>,
+    // #[template_child]
+    // pub greet_button: TemplateChild<Button>,
+    // #[template_child]
+    // pub clear_button: TemplateChild<Button>,
 }
 
 // The central trait for subclassing a GObject
@@ -62,11 +63,13 @@ impl ApplicationWindowImpl for QToolAppWindow {}
 // Trait shared by all adwaita application windows
 impl AdwApplicationWindowImpl for QToolAppWindow {}
 
+// impl callbacks
 #[gtk::template_callbacks]
 impl QToolAppWindow {
     #[template_callback]
     fn on_greet_clicked(button: &Button) {
         // Set the label to "Hello World!" after the button has been clicked on
+        button.set_label("Hello World!");
         println!("greet clicked")
     }
 

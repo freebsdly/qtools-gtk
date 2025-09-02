@@ -1,0 +1,125 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $QToolAppWindow : Adw.ApplicationWindow {
+    can-focus: true;
+    title: _("Blueprint Demo");
+    default-width: 600;
+    default-height: 400;
+
+    Adw.Breakpoint {
+        condition ("max-width: 500sp")
+    }
+
+ Adw.MultiLayoutView view {
+    Adw.Layout {
+      name: "wide";
+
+      content: Adw.OverlaySplitView {
+        sidebar: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            show-title: false;
+          }
+
+          content: Adw.LayoutSlot {
+            id: "sidebar";
+          };
+        };
+
+        content: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            show-title: false;
+          }
+
+          content: Adw.LayoutSlot {
+            id: "content";
+          };
+        };
+      };
+    }
+
+    Adw.Layout {
+      name: "narrow";
+
+      content: Adw.ToolbarView {
+        bottom-bar-style: raised;
+
+        [top]
+        Adw.HeaderBar {
+          show-title: false;
+        }
+
+        content: Adw.LayoutSlot {
+          id: "content";
+        };
+
+        [bottom]
+        Adw.LayoutSlot {
+          id: "sidebar";
+          height-request: 100;
+        }
+      };
+    }
+
+    [sidebar]
+    Label {
+      label: "Sidebar";
+
+      styles [
+        "title-1",
+      ]
+    }
+
+    [content]
+    Box {
+        orientation: vertical;
+        spacing: 12;
+        margin-top: 12;
+        margin-bottom: 12;
+        margin-start: 12;
+        margin-end: 12;
+
+        // 按钮区域
+        Box {
+            orientation: horizontal;
+            spacing: 8;
+            halign: center;
+            margin-top: 8;
+
+            Gtk.Button greet_button {
+                label: _("Greet");
+                clicked => on_greet_clicked();
+            }
+
+            Gtk.Button clear_button {
+                label: _("Clear");
+                clicked => on_clear_clicked();
+            }
+        }
+
+        // 结果显示区域
+        Label {
+            name: "result_label";
+            label: _("");
+            halign: center;
+            margin-top: 16;
+            wrap: true;
+        }
+
+        // 填充空间的空白元素
+        Box {
+            vexpand: true;
+        }
+
+        // 状态栏
+        Label {
+            label: _("Powered by GTK and Blueprint");
+            halign: center;
+            opacity: 0.7;
+            css-classes: ["caption"];
+        }
+    }
+  }
+}
