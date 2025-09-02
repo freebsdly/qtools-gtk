@@ -2,18 +2,24 @@ use std::cell::OnceCell;
 use adw::{glib, ApplicationWindow};
 use adw::gio::Settings;
 use adw::subclass::prelude::*;
-use gtk::CompositeTemplate;
+use gtk::{Button, CompositeTemplate};
 use glib::subclass::InitializingObject;
+use gtk::prelude::ButtonExt;
+use crate::main_window::Window;
 
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/top/qinhuajun/app/main_window.ui")]
-pub struct Window {
+pub struct QToolAppWindow {
     pub settings: OnceCell<Settings>,
+    #[template_child]
+    pub greet_button: TemplateChild<Button>,
+    #[template_child]
+    pub clear_button: TemplateChild<Button>,
 }
 
 // The central trait for subclassing a GObject
 #[glib::object_subclass]
-impl ObjectSubclass for Window {
+impl ObjectSubclass for QToolAppWindow {
     // `NAME` needs to match `class` attribute of template
     const NAME: &'static str = "QToolAppWindow";
     type Type = super::Window;
@@ -21,6 +27,7 @@ impl ObjectSubclass for Window {
 
     fn class_init(klass: &mut Self::Class) {
         klass.bind_template();
+        klass.bind_template_callbacks();
     }
 
     fn instance_init(obj: &InitializingObject<Self>) {
@@ -29,7 +36,7 @@ impl ObjectSubclass for Window {
 }
 
 // Trait shared by all GObjects
-impl ObjectImpl for Window {
+impl ObjectImpl for QToolAppWindow {
     fn constructed(&self) {
         // Call "constructed" on parent
         self.parent_constructed();
@@ -42,15 +49,30 @@ impl ObjectImpl for Window {
 // ANCHOR_END: object_impl
 
 // Trait shared by all widgets
-impl WidgetImpl for Window {}
+impl WidgetImpl for QToolAppWindow {}
 
 // ANCHOR: window_impl
 // Trait shared by all windows
-impl WindowImpl for Window {}
+impl WindowImpl for QToolAppWindow {}
 // ANCHOR_END: window_impl
 
 // Trait shared by all application windows
-impl ApplicationWindowImpl for Window {}
+impl ApplicationWindowImpl for QToolAppWindow {}
 
 // Trait shared by all adwaita application windows
-impl AdwApplicationWindowImpl for Window {}
+impl AdwApplicationWindowImpl for QToolAppWindow {}
+
+#[gtk::template_callbacks]
+impl QToolAppWindow {
+    #[template_callback]
+    fn on_greet_clicked(button: &Button) {
+        // Set the label to "Hello World!" after the button has been clicked on
+        println!("greet clicked")
+    }
+
+    #[template_callback]
+    fn on_clear_clicked(button: &Button) {
+        // Set the label to "Hello World!" after the button has been clicked on
+        println!("clear clicked")
+    }
+}

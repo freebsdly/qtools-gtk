@@ -11,6 +11,9 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
     <property name="default-width">600</property>
     <property name="default-height">400</property>
     <child>
+      <object class="GtkHeaderBar"></object>
+    </child>
+    <child>
       <object class="GtkBox">
         <property name="orientation">1</property>
         <property name="spacing">12</property>
@@ -18,6 +21,11 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
         <property name="margin-bottom">12</property>
         <property name="margin-start">12</property>
         <property name="margin-end">12</property>
+        <child>
+          <object class="GtkMenuButton">
+            <property name="menu-model">my_menu</property>
+          </object>
+        </child>
         <child>
           <object class="GtkLabel">
             <property name="label" translatable="yes">Welcome to Blueprint Demo</property>
@@ -59,13 +67,13 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
             <property name="halign">3</property>
             <property name="margin-top">8</property>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="greet_button">
                 <property name="label" translatable="yes">Greet</property>
                 <signal name="clicked" handler="on_greet_clicked"/>
               </object>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="clear_button">
                 <property name="label" translatable="yes">Clear</property>
                 <signal name="clicked" handler="on_clear_clicked"/>
               </object>
@@ -97,4 +105,14 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
       </object>
     </child>
   </template>
+  <menu id="my_menu">
+    <submenu>
+      <attribute name="label" translatable="yes">File</attribute>
+      <item>
+        <attribute name="label" translatable="yes">New</attribute>
+        <attribute name="action">app.new</attribute>
+        <attribute name="icon">document-new-symbolic</attribute>
+      </item>
+    </submenu>
+  </menu>
 </interface>
