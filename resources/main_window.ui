@@ -13,135 +13,39 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
     <property name="default-height">400</property>
     <child>
       <object class="AdwBreakpoint">
-        <condition>max-width: 500sp</condition>
+        <condition>max-width: 400sp</condition>
+        <setter object="split_view" property="collapsed">true</setter>
       </object>
     </child>
-    <child>
-      <object class="AdwMultiLayoutView" id="view">
-        <child>
-          <object class="AdwLayout">
-            <property name="name">wide</property>
-            <property name="content">
-              <object class="AdwOverlaySplitView">
-                <property name="sidebar">
-                  <object class="AdwToolbarView">
-                    <child type="top">
-                      <object class="AdwHeaderBar">
-                        <property name="show-title">false</property>
-                      </object>
-                    </child>
-                    <property name="content">
-                      <object class="AdwLayoutSlot">
-                        <property name="id">sidebar</property>
-                      </object>
-                    </property>
-                  </object>
-                </property>
-                <property name="content">
-                  <object class="AdwToolbarView">
-                    <child type="top">
-                      <object class="AdwHeaderBar">
-                        <property name="show-title">false</property>
-                      </object>
-                    </child>
-                    <property name="content">
-                      <object class="AdwLayoutSlot">
-                        <property name="id">content</property>
-                      </object>
-                    </property>
-                  </object>
-                </property>
-              </object>
-            </property>
-          </object>
-        </child>
-        <child>
-          <object class="AdwLayout">
-            <property name="name">narrow</property>
-            <property name="content">
+    <property name="content">
+      <object class="AdwNavigationSplitView" id="split_view">
+        <property name="sidebar">
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Sidebar</property>
+            <property name="tag">sidebar</property>
+            <property name="child">
               <object class="AdwToolbarView">
-                <property name="bottom-bar-style">1</property>
                 <child type="top">
-                  <object class="AdwHeaderBar">
-                    <property name="show-title">false</property>
-                  </object>
-                </child>
-                <property name="content">
-                  <object class="AdwLayoutSlot">
-                    <property name="id">content</property>
-                  </object>
-                </property>
-                <child type="bottom">
-                  <object class="AdwLayoutSlot">
-                    <property name="id">sidebar</property>
-                    <property name="height-request">100</property>
-                  </object>
+                  <object class="AdwHeaderBar"></object>
                 </child>
               </object>
             </property>
           </object>
-        </child>
-        <child type="sidebar">
-          <object class="GtkLabel">
-            <property name="label">Sidebar</property>
-            <style>
-              <class name="title-1"/>
-            </style>
-          </object>
-        </child>
-        <child type="content">
-          <object class="GtkBox">
-            <property name="orientation">1</property>
-            <property name="spacing">12</property>
-            <property name="margin-top">12</property>
-            <property name="margin-bottom">12</property>
-            <property name="margin-start">12</property>
-            <property name="margin-end">12</property>
-            <child>
-              <object class="GtkBox">
-                <property name="orientation">0</property>
-                <property name="spacing">8</property>
-                <property name="halign">3</property>
-                <property name="margin-top">8</property>
-                <child>
-                  <object class="GtkButton" id="greet_button">
-                    <property name="label" translatable="yes">Greet</property>
-                    <signal name="clicked" handler="on_greet_clicked"/>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkButton" id="clear_button">
-                    <property name="label" translatable="yes">Clear</property>
-                    <signal name="clicked" handler="on_clear_clicked"/>
-                  </object>
+        </property>
+        <property name="content">
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Content</property>
+            <property name="tag">content</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"></object>
                 </child>
               </object>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="name">result_label</property>
-                <property name="label" translatable="yes"></property>
-                <property name="halign">3</property>
-                <property name="margin-top">16</property>
-                <property name="wrap">true</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="vexpand">true</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="label" translatable="yes">Powered by GTK and Blueprint</property>
-                <property name="halign">3</property>
-                <property name="opacity">0.7</property>
-                <property name="css-classes">caption</property>
-              </object>
-            </child>
+            </property>
           </object>
-        </child>
+        </property>
       </object>
-    </child>
+    </property>
   </template>
 </interface>
