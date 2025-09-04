@@ -78,4 +78,12 @@ impl QToolAppWindow {
         // Set the label to "Hello World!" after the button has been clicked on
         println!("clear clicked")
     }
+
+    #[template_callback]
+    fn get_color_scheme_icon_name() {
+
+    }
+
+    #[template_callback]
+    fn color_scheme_button_clicked(button: &Button) {}
 }
