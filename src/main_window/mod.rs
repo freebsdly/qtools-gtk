@@ -5,11 +5,11 @@ pub mod menu;
 mod sidebar;
 
 use crate::ai_chat;
-use adw::prelude::*;
 use adw::ApplicationWindow;
+use adw::prelude::*;
 use content::MainContent;
-use gtk::gio;
-use sidebar::MainSidebar;
+use gtk::{Label, gio};
+use sidebar::{MainSidebar, MenuItem};
 
 pub struct MainWindow {
     pub window: ApplicationWindow,
@@ -21,7 +21,10 @@ pub struct MainWindow {
 impl MainWindow {
     pub fn new(app: &adw::Application) -> Self {
         // 创建侧边栏
-        let sidebar = MainSidebar::new();
+        let mut sidebar = MainSidebar::new();
+
+        // 添加菜单项
+        Self::setup_menu_items(&mut sidebar);
 
         // 创建主要内容区域
         let main_content = MainContent::new();
@@ -56,8 +59,8 @@ impl MainWindow {
             sidebar,
         };
 
-        // 添加AI聊天按钮并连接事件
-        main_window.add_ai_chat_button();
+        // 设置菜单项点击事件
+        main_window.setup_menu_callbacks();
 
         main_window
     }
@@ -65,21 +68,52 @@ impl MainWindow {
     pub fn present(&self) {
         self.window.present();
     }
-    
-    // 添加AI聊天按钮到侧边栏并连接事件
-    fn add_ai_chat_button(&mut self) {
-        let button = self.sidebar.add_action_button("AI Chat");
+
+    // 设置菜单项
+    fn setup_menu_items(sidebar: &mut MainSidebar) {
+        // 添加AI聊天菜单项
+        let ai_chat_item = MenuItem::new("ai_chat", "AI Chat", "chat-symbolic");
+        sidebar.add_menu_item(ai_chat_item);
+
+        // 添加demo菜单项
+        let demo_item = MenuItem::new("demo", "Demo", "emblem-system-symbolic");
+        sidebar.add_menu_item(demo_item);
+
+        // 构建菜单
+        sidebar.build_menu(|item| {
+            println!("点击了菜单项: {}", item.id);
+        });
+    }
+
+    // 设置菜单回调
+    fn setup_menu_callbacks(&mut self) {
         let main_content_box = self.main_content.get_content_box().clone();
         let ai_chat_widget = self.ai_chat.page.clone();
-        
-        button.connect_clicked(move |_| {
-            println!("点击了AI Chat按钮");
-            // 清除主内容区域的所有子组件
-            while let Some(child) = main_content_box.first_child() {
-                main_content_box.remove(&child);
+
+        // 重新构建菜单并设置正确的回调
+        self.sidebar.build_menu(move |item| {
+            match item.id.as_str() {
+                "ai_chat" => {
+                    // 清除主内容区域的所有子组件
+                    while let Some(child) = main_content_box.first_child() {
+                        main_content_box.remove(&child);
+                    }
+                    // 添加AI聊天界面到主内容区域
+                    main_content_box.append(&ai_chat_widget);
+                }
+                "demo" => {
+                    // 清除主内容区域的所有子组件
+                    while let Some(child) = main_content_box.first_child() {
+                        main_content_box.remove(&child);
+                    }
+                    // 添加Demo界面到主内容区域
+                    main_content_box
+                        .append(&Label::new(Some("这是一个Demo页面".to_string().as_str())));
+                }
+                _ => {
+                    println!("未处理的菜单项: {}", item.id);
+                }
             }
-            // 添加AI聊天界面到主内容区域
-            main_content_box.append(&ai_chat_widget);
         });
     }
 

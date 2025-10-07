@@ -1,11 +1,31 @@
 use adw::prelude::*;
 use adw::{HeaderBar, NavigationPage, ToolbarView};
 use gtk::{Box, Button, Label, Orientation, PolicyType, ScrolledWindow};
+use std::rc::Rc;
+
+// 定义菜单项结构
+#[derive(Clone)]
+pub struct MenuItem {
+    pub id: String,
+    pub label: String,
+    pub icon: String,
+}
+
+impl MenuItem {
+    pub fn new(id: &str, label: &str, icon: &str) -> Self {
+        Self {
+            id: id.to_string(),
+            label: label.to_string(),
+            icon: icon.to_string(),
+        }
+    }
+}
 
 pub struct MainSidebar {
     pub page: NavigationPage,
     sidebar_content: Box,
     buttons: Vec<Button>,
+    menu_items: Vec<MenuItem>,
 }
 
 impl MainSidebar {
@@ -45,18 +65,53 @@ impl MainSidebar {
             .title("侧边栏") // 为NavigationPage设置标题
             .build();
 
-        Self { 
-            page, 
+        Self {
+            page,
             sidebar_content,
             buttons: Vec::new(),
+            menu_items: Vec::new(),
         }
     }
-    
-    // 添加动作按钮到侧边栏
-    pub fn add_action_button(&mut self, label: &str) -> Button {
-        let button = Button::builder().label(label).build();
-        self.sidebar_content.append(&button);
-        self.buttons.push(button.clone());
+
+    // 添加菜单项到侧边栏
+    pub fn add_menu_item(&mut self, menu_item: MenuItem) {
+        self.menu_items.push(menu_item);
+    }
+
+    // 根据菜单项生成菜单界面
+    pub fn build_menu<F: Fn(&MenuItem) + 'static>(&mut self, callback: F) {
+        // 清空现有内容
+        while let Some(child) = self.sidebar_content.first_child() {
+            self.sidebar_content.remove(&child);
+        }
+
+        self.buttons.clear();
+
+        // 使用 Rc 包装回调函数以便在多个按钮间共享
+        let callback_rc = Rc::new(callback);
+
+        // 根据菜单项生成按钮
+        for item in &self.menu_items {
+            let button = self.create_menu_button(item, callback_rc.clone());
+            self.sidebar_content.append(&button);
+            self.buttons.push(button);
+        }
+    }
+
+    // 创建菜单按钮
+    fn create_menu_button<F: Fn(&MenuItem) + 'static>(
+        &self,
+        menu_item: &MenuItem,
+        callback: Rc<F>,
+    ) -> Button {
+        let button = Button::builder().label(&menu_item.label).build();
+
+        let callback_clone = callback.clone();
+        let item_clone = menu_item.clone();
+        button.connect_clicked(move |_| {
+            callback_clone(&item_clone);
+        });
+
         button
     }
 }
