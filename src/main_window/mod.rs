@@ -4,14 +4,18 @@ mod content;
 pub mod menu;
 mod sidebar;
 
-use adw::ApplicationWindow;
+use crate::ai_chat;
 use adw::prelude::*;
+use adw::ApplicationWindow;
 use content::MainContent;
 use gtk::gio;
 use sidebar::MainSidebar;
 
 pub struct MainWindow {
     pub window: ApplicationWindow,
+    ai_chat: ai_chat::AIChat,
+    main_content: MainContent,
+    sidebar: MainSidebar,
 }
 
 impl MainWindow {
@@ -20,12 +24,15 @@ impl MainWindow {
         let sidebar = MainSidebar::new();
 
         // 创建主要内容区域
-        let content = MainContent::new();
+        let main_content = MainContent::new();
+
+        // 创建AI聊天模块
+        let ai_chat = ai_chat::AIChat::new();
 
         // 创建分割视图（带侧边栏）
         let split_view = adw::NavigationSplitView::builder()
             .sidebar(&sidebar.page)
-            .content(&content.page)
+            .content(&main_content.page)
             .min_sidebar_width(200.0)
             .max_sidebar_width(300.0)
             .build();
@@ -42,11 +49,38 @@ impl MainWindow {
             .content(&split_view)
             .build();
 
-        Self { window }
+        let mut main_window = Self {
+            window,
+            ai_chat,
+            main_content,
+            sidebar,
+        };
+
+        // 添加AI聊天按钮并连接事件
+        main_window.add_ai_chat_button();
+
+        main_window
     }
 
     pub fn present(&self) {
         self.window.present();
+    }
+    
+    // 添加AI聊天按钮到侧边栏并连接事件
+    fn add_ai_chat_button(&mut self) {
+        let button = self.sidebar.add_action_button("AI Chat");
+        let main_content_box = self.main_content.get_content_box().clone();
+        let ai_chat_widget = self.ai_chat.page.clone();
+        
+        button.connect_clicked(move |_| {
+            println!("点击了AI Chat按钮");
+            // 清除主内容区域的所有子组件
+            while let Some(child) = main_content_box.first_child() {
+                main_content_box.remove(&child);
+            }
+            // 添加AI聊天界面到主内容区域
+            main_content_box.append(&ai_chat_widget);
+        });
     }
 
     // 动作处理函数
@@ -71,7 +105,7 @@ impl MainWindow {
     }
 
     fn action_about(window: &ApplicationWindow) {
-        about::AppAboutDialog::show(window);
+        crate::main_window::about::AppAboutDialog::show(window);
     }
 
     fn action_quit(_window: &ApplicationWindow) {

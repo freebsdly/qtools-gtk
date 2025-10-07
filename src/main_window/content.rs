@@ -5,6 +5,7 @@ use crate::main_window::menu::AppMenu;
 
 pub struct MainContent {
     pub page: NavigationPage,
+    content_box: Box,
 }
 
 impl MainContent {
@@ -14,7 +15,7 @@ impl MainContent {
         
         // 创建内容区域标题栏
         let content_header = HeaderBar::builder()
-            // .title_widget(&Label::new(Some("主要内容")))
+            .title_widget(&Label::new(Some("")))
             .show_start_title_buttons(true)
             .build();
             
@@ -46,6 +47,14 @@ impl MainContent {
             .title("主要内容") // 为NavigationPage设置标题
             .build();
         
-        Self { page }
+        Self { 
+            page,
+            content_box: main_content,
+        }
+    }
+    
+    // 获取主内容区域的Box，用于添加或替换内容
+    pub fn get_content_box(&self) -> &Box {
+        &self.content_box
     }
 }

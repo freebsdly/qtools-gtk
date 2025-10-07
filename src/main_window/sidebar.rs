@@ -1,16 +1,18 @@
 use adw::prelude::*;
 use adw::{HeaderBar, NavigationPage, ToolbarView};
-use gtk::{Box, Label, Orientation, PolicyType, ScrolledWindow};
+use gtk::{Box, Button, Label, Orientation, PolicyType, ScrolledWindow};
 
 pub struct MainSidebar {
     pub page: NavigationPage,
+    sidebar_content: Box,
+    buttons: Vec<Button>,
 }
 
 impl MainSidebar {
     pub fn new() -> Self {
         // 创建侧边栏标题栏
         let sidebar_header = HeaderBar::builder()
-            .title_widget(&Label::new(Some("侧边栏")))
+            .title_widget(&Label::new(Some("")))
             .show_end_title_buttons(true)
             .build();
 
@@ -21,9 +23,6 @@ impl MainSidebar {
             .orientation(Orientation::Vertical)
             .spacing(10)
             .build();
-        sidebar_content.append(&Label::new(Some("侧边栏项目 1")));
-        sidebar_content.append(&Label::new(Some("侧边栏项目 2")));
-        sidebar_content.append(&Label::new(Some("侧边栏项目 3")));
 
         // 为侧边栏内容添加CSS类
         sidebar_content.add_css_class("main-sidebar");
@@ -46,6 +45,18 @@ impl MainSidebar {
             .title("侧边栏") // 为NavigationPage设置标题
             .build();
 
-        Self { page }
+        Self { 
+            page, 
+            sidebar_content,
+            buttons: Vec::new(),
+        }
+    }
+    
+    // 添加动作按钮到侧边栏
+    pub fn add_action_button(&mut self, label: &str) -> Button {
+        let button = Button::builder().label(label).build();
+        self.sidebar_content.append(&button);
+        self.buttons.push(button.clone());
+        button
     }
 }

@@ -1,6 +1,7 @@
 #![windows_subsystem = "windows"]
 
 mod main_window;
+mod ai_chat;
 
 use adw::prelude::*;
 use adw::Application;
