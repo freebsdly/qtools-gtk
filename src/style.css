@@ -1,0 +1,21 @@
+.header-bar {
+    /* #cfcfcf replace @borders */
+    border-bottom: 1px solid #cfcfcf;
+}
+
+.main-content {
+    margin: 20px;
+    padding: 10px;
+    /*background-color: #fafafa;*/
+    border-radius: 8px;
+}
+
+.main-sidebar {
+    margin: 20px;
+    padding: 10px;
+    /*background-color: #f0f0f0;*/
+    border-radius: 8px;
+}
+
+/* GTK不支持@media查询，深色主题由系统自动处理 */
+/* 您可以在应用中通过Adw.StyleManager手动控制主题 */
