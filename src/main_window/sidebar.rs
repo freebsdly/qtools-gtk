@@ -1,6 +1,7 @@
 use adw::prelude::*;
 use adw::{HeaderBar, NavigationPage, ToolbarView};
 use gtk::{Box, Button, Label, Orientation, PolicyType, ScrolledWindow};
+use std::cell::RefCell;
 use std::rc::Rc;
 
 // 定义菜单项结构
@@ -21,11 +22,15 @@ impl MenuItem {
     }
 }
 
+// 定义菜单项点击回调类型
+pub type MenuItemCallback = Rc<RefCell<dyn Fn(&MenuItem) + 'static>>;
+
 pub struct MainSidebar {
     pub page: NavigationPage,
     sidebar_content: Box,
     buttons: Vec<Button>,
     menu_items: Vec<MenuItem>,
+    callback: Option<MenuItemCallback>,
 }
 
 impl MainSidebar {
@@ -70,6 +75,7 @@ impl MainSidebar {
             sidebar_content,
             buttons: Vec::new(),
             menu_items: Vec::new(),
+            callback: None,
         }
     }
 
@@ -78,8 +84,13 @@ impl MainSidebar {
         self.menu_items.push(menu_item);
     }
 
+    // 设置菜单项点击回调
+    pub fn set_callback<F: Fn(&MenuItem) + 'static>(&mut self, callback: F) {
+        self.callback = Some(Rc::new(RefCell::new(callback)));
+    }
+
     // 根据菜单项生成菜单界面
-    pub fn build_menu<F: Fn(&MenuItem) + 'static>(&mut self, callback: F) {
+    pub fn build_menu(&mut self) {
         // 清空现有内容
         while let Some(child) = self.sidebar_content.first_child() {
             self.sidebar_content.remove(&child);
@@ -87,29 +98,31 @@ impl MainSidebar {
 
         self.buttons.clear();
 
-        // 使用 Rc 包装回调函数以便在多个按钮间共享
-        let callback_rc = Rc::new(callback);
+        // 如果没有设置回调函数，则不创建按钮
+        let callback = match &self.callback {
+            Some(cb) => cb.clone(),
+            None => return,
+        };
 
         // 根据菜单项生成按钮
         for item in &self.menu_items {
-            let button = self.create_menu_button(item, callback_rc.clone());
+            let button = self.create_menu_button(item, callback.clone());
             self.sidebar_content.append(&button);
             self.buttons.push(button);
         }
     }
 
     // 创建菜单按钮
-    fn create_menu_button<F: Fn(&MenuItem) + 'static>(
+    fn create_menu_button(
         &self,
         menu_item: &MenuItem,
-        callback: Rc<F>,
+        callback: MenuItemCallback,
     ) -> Button {
         let button = Button::builder().label(&menu_item.label).build();
 
-        let callback_clone = callback.clone();
         let item_clone = menu_item.clone();
         button.connect_clicked(move |_| {
-            callback_clone(&item_clone);
+            callback.borrow()(&item_clone);
         });
 
         button

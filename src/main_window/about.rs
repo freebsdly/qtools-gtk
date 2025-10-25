@@ -11,9 +11,9 @@ impl AppAboutDialog {
             .developer_name("Qinhuajun")
             .version("0.1.0")
             .comments("一个基于 Rust 和 GTK 的实用工具集")
-            .website("https://github.com/qinhuajun/qtools")
-            .issue_url("https://github.com/qinhuajun/qtools/issues")
-            .developers(vec!["Qinhuajun https://github.com/qinhuajun"])
+            .website("https://github.com/freebsdly/qtools")
+            .issue_url("https://github.com/freebsdly/qtools/issues")
+            .developers(vec!["Qinhuajun https://github.com/freebsdly"])
             .copyright("© 2025 Qinhuajun")
             .license_type(gtk::License::MitX11)
             .build();

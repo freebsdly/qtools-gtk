@@ -78,20 +78,15 @@ impl MainWindow {
         // 添加demo菜单项
         let demo_item = MenuItem::new("demo", "Demo", "emblem-system-symbolic");
         sidebar.add_menu_item(demo_item);
-
-        // 构建菜单
-        sidebar.build_menu(|item| {
-            println!("点击了菜单项: {}", item.id);
-        });
     }
 
     // 设置菜单回调
     fn setup_menu_callbacks(&mut self) {
         let main_content_box = self.main_content.get_content_box().clone();
         let ai_chat_widget = self.ai_chat.page.clone();
-
-        // 重新构建菜单并设置正确的回调
-        self.sidebar.build_menu(move |item| {
+        
+        // 设置回调函数
+        self.sidebar.set_callback(move |item| {
             match item.id.as_str() {
                 "ai_chat" => {
                     // 清除主内容区域的所有子组件
@@ -115,6 +110,9 @@ impl MainWindow {
                 }
             }
         });
+        
+        // 构建菜单
+        self.sidebar.build_menu();
     }
 
     // 动作处理函数
@@ -147,54 +145,25 @@ impl MainWindow {
     }
 
     pub fn setup_actions(&self, app: &adw::Application) {
-        // 创建应用级别的动作
-        let new_action = gio::SimpleAction::new("new", None);
-        let window = self.window.clone();
-        new_action.connect_activate(move |_, _| {
-            Self::action_new(&window);
-        });
-        app.add_action(&new_action);
+        // 定义动作配置
+        let actions = vec![
+            ("new", Self::action_new as fn(&_)),
+            ("open", Self::action_open),
+            ("save", Self::action_save),
+            ("save-as", Self::action_save_as),
+            ("preferences", Self::action_preferences),
+            ("about", Self::action_about),
+            ("quit", Self::action_quit),
+        ];
 
-        let open_action = gio::SimpleAction::new("open", None);
-        let window = self.window.clone();
-        open_action.connect_activate(move |_, _| {
-            Self::action_open(&window);
-        });
-        app.add_action(&open_action);
-
-        let save_action = gio::SimpleAction::new("save", None);
-        let window = self.window.clone();
-        save_action.connect_activate(move |_, _| {
-            Self::action_save(&window);
-        });
-        app.add_action(&save_action);
-
-        let save_as_action = gio::SimpleAction::new("save-as", None);
-        let window = self.window.clone();
-        save_as_action.connect_activate(move |_, _| {
-            Self::action_save_as(&window);
-        });
-        app.add_action(&save_as_action);
-
-        let preferences_action = gio::SimpleAction::new("preferences", None);
-        let window = self.window.clone();
-        preferences_action.connect_activate(move |_, _| {
-            Self::action_preferences(&window);
-        });
-        app.add_action(&preferences_action);
-
-        let about_action = gio::SimpleAction::new("about", None);
-        let window = self.window.clone();
-        about_action.connect_activate(move |_, _| {
-            Self::action_about(&window);
-        });
-        app.add_action(&about_action);
-
-        let quit_action = gio::SimpleAction::new("quit", None);
-        let window = self.window.clone();
-        quit_action.connect_activate(move |_, _| {
-            Self::action_quit(&window);
-        });
-        app.add_action(&quit_action);
+        // 批量创建和注册动作
+        for (name, handler) in actions {
+            let action = gio::SimpleAction::new(name, None);
+            let window = self.window.clone();
+            action.connect_activate(move |_, _| {
+                handler(&window);
+            });
+            app.add_action(&action);
+        }
     }
 }
