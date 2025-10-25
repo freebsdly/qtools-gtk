@@ -32,16 +32,20 @@ impl MainWindow {
         // 创建AI聊天模块
         let ai_chat = ai_chat::AIChat::new();
 
-        // 创建分割视图（带侧边栏）
-        let split_view = adw::NavigationSplitView::builder()
-            .sidebar(&sidebar.page)
+        // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
+        let split_view = adw::OverlaySplitView::builder()
+            .sidebar(sidebar.get_sidebar_container())
             .content(&main_content.page)
-            .min_sidebar_width(200.0)
+            .collapsed(false) // 默认展开
+            .min_sidebar_width(50.0) // 最小宽度设为50，足够显示图标
             .max_sidebar_width(300.0)
             .build();
 
         // 设置分割视图垂直扩展以填满可用空间
         split_view.set_vexpand(true);
+
+        // 将分割视图引用设置到侧边栏
+        sidebar.set_split_view(&split_view);
 
         // 创建窗口
         let window = ApplicationWindow::builder()
@@ -84,7 +88,7 @@ impl MainWindow {
     fn setup_menu_callbacks(&mut self) {
         let main_content_box = self.main_content.get_content_box().clone();
         let ai_chat_widget = self.ai_chat.page.clone();
-        
+
         // 设置回调函数
         self.sidebar.set_callback(move |item| {
             match item.id.as_str() {
@@ -110,7 +114,7 @@ impl MainWindow {
                 }
             }
         });
-        
+
         // 构建菜单
         self.sidebar.build_menu();
     }
