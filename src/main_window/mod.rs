@@ -7,15 +7,15 @@ mod sidebar;
 use crate::app::QtoolsApplication;
 use adw::glib;
 use adw::glib::Object;
-use adw::prelude::IsA;
 use gtk::gio;
 use gtk::prelude::GtkWindowExt;
 
 mod imp {
     use adw::glib;
     use adw::subclass::prelude::{
-        AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass,
+        AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
+    use gtk::prelude::GtkWindowExt;
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
 
     #[derive(Default)]
@@ -31,6 +31,7 @@ mod imp {
     impl ObjectImpl for MainWindow {
         fn constructed(&self) {
             self.parent_constructed();
+            self.obj().set_default_height(1000)
         }
     }
 
@@ -51,43 +52,33 @@ glib::wrapper! {
 impl MainWindow {
     pub fn new(app: &QtoolsApplication) -> Self {
         Object::builder().property("application", app).build()
+        // // 创建侧边栏
+        // let sidebar = sidebar::MainSidebar::new();
+        //
+        // // 创建主要内容区域
+        // let main_content = content::MainContent::new();
+        //
+        // // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
+        // let overlay_view = adw::OverlaySplitView::builder()
+        //     .sidebar(&sidebar)
+        //     .content(&main_content)
+        //     .collapsed(false) // 默认展开
+        //     .min_sidebar_width(50.0) // 最小宽度设为50，足够显示图标
+        //     .max_sidebar_width(300.0)
+        //     .build();
+        //
+        // // 设置分割视图垂直扩展以填满可用空间
+        // overlay_view.set_vexpand(true);
+        //
+        // // 创建窗口
+        // let window: Self = ApplicationWindow::builder()
+        //     .application(app)
+        //     .title("Qtools")
+        //     .default_width(1000)
+        //     .default_height(700)
+        //     .content(&overlay_view)
+        //     .build();
+        //
+        // window
     }
-    // pub fn new(&self) -> Self {
-    // // 创建菜单
-    // let app_menu = AppMenu::new();
-    //
-    // // 创建侧边栏
-    // let sidebar = MainSidebar::new();
-    //
-    // // 创建主要内容区域
-    // let main_content = MainContent::new();
-    //
-    // // 创建AI聊天模块
-    // let ai_chat = ai_chat::AIChat::new();
-    //
-    // // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
-    // let overlay_view = adw::OverlaySplitView::builder()
-    //     .sidebar(&sidebar)
-    //     .content(&main_content)
-    //     .collapsed(false) // 默认展开
-    //     .min_sidebar_width(50.0) // 最小宽度设为50，足够显示图标
-    //     .max_sidebar_width(300.0)
-    //     .build();
-    //
-    // // 设置分割视图垂直扩展以填满可用空间
-    // overlay_view.set_vexpand(true);
-    // // 创建窗口
-    // let window = ApplicationWindow::builder()
-    //     .application(app)
-    //     .title("My GTK App")
-    //     .default_width(1000)
-    //     .default_height(700)
-    //     .content(&overlay_view)
-    //     .build();
-    //
-    // // 将菜单添加到窗口的标题栏
-    // if let Some(titlebar) = window.titlebar() {
-    //     let header_bar = titlebar.downcast_ref::<adw::HeaderBar>().unwrap();
-    //     header_bar.pack_end(app_menu.menu_button());
-    // }
 }
