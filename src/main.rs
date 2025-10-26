@@ -1,40 +1,32 @@
 #![windows_subsystem = "windows"]
 
-mod main_window;
 mod ai_chat;
+mod app;
+mod main_window;
 
 use adw::prelude::*;
-use adw::Application;
+use app::QtoolsApplication;
 use gtk::glib;
-use gtk::{gdk, CssProvider};
+use gtk::{CssProvider, gdk};
 
 const APP_ID: &str = "top.qinhuajun.app";
 
 fn main() -> glib::ExitCode {
-    // Create a new application
-    let app = Application::builder().application_id(APP_ID).build();
+    let app = QtoolsApplication::new();
 
     // Connect to signals
     app.connect_startup(|app| {
         setup_shortcuts(app);
         load_css();
     });
-    app.connect_activate(build_ui);
-
-    // Run the application
+    app.connect_activate(|app| {
+        let main_window = main_window::MainWindow::new(app);
+        main_window.present();
+    });
     app.run()
 }
 
-fn build_ui(app: &Application) {
-    let main_window = main_window::MainWindow::new(app);
-    // Setup actions with window reference
-    main_window.setup_actions(app);
-    main_window.present();
-    
-
-}
-
-fn setup_shortcuts(app: &Application) {
+fn setup_shortcuts(app: &QtoolsApplication) {
     app.set_accels_for_action("win.filter('All')", &["<Ctrl>a"]);
     app.set_accels_for_action("win.filter('Open')", &["<Ctrl>o"]);
     app.set_accels_for_action("win.filter('Done')", &["<Ctrl>d"]);
@@ -44,7 +36,7 @@ fn load_css() {
     // Load the CSS file
     let provider = CssProvider::new();
     provider.load_from_string(include_str!("style.css"));
-    
+
     // Add the provider to the default screen
     gtk::style_context_add_provider_for_display(
         &gdk::Display::default().expect("Could not connect to a display."),
