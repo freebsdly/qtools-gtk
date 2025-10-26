@@ -17,5 +17,17 @@
     border-radius: 8px;
 }
 
+.toolbar {
+    background-color: #f6f6f6;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.toolbar button.compact {
+    min-width: 0;
+    padding: 0;
+    margin: 2px 0;
+}
+
 /* GTK不支持@media查询，深色主题由系统自动处理 */
 /* 您可以在应用中通过Adw.StyleManager手动控制主题 */
