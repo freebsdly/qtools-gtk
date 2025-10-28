@@ -4,19 +4,18 @@ pub mod menu;
 mod sidebar;
 
 use crate::app::QtoolsApplication;
+use adw::glib;
 use adw::glib::Object;
-use adw::prelude::{ActionMapExt, AdwDialogExt, ApplicationExt, FileExt};
-use adw::{AboutDialog, glib};
+use adw::prelude::{ActionMapExt, FileExt};
 use gtk::gio;
-use gtk::prelude::GtkWindowExt;
 
 mod imp {
     use crate::main_window::{content, sidebar};
-    use adw::prelude::{ActionMapExt, AdwApplicationWindowExt};
+    use adw::glib;
+    use adw::prelude::AdwApplicationWindowExt;
     use adw::subclass::prelude::{
         AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
-    use adw::{gio, glib};
     use gtk::prelude::{GtkWindowExt, WidgetExt};
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
 
@@ -54,7 +53,7 @@ mod imp {
             obj.set_title(Some("Qtools"));
             obj.set_default_size(1024, 768);
             obj.set_content(Some(&overlay_view));
-            
+
             // 在窗口构造完成后初始化窗口级别的动作
             obj.setup_actions();
         }
@@ -91,12 +90,11 @@ impl MainWindow {
         let filter = gtk::FileFilter::new();
         filter.set_name(Some("文本文件"));
         filter.add_mime_type("text/plain");
-        
+
         let filters = gio::ListStore::new::<gtk::FileFilter>();
         filters.append(&filter);
         dialog.set_filters(Some(&filters));
 
-        let window = self.clone();
         dialog.save(Some(self), None::<&gio::Cancellable>, move |result| {
             if let Ok(file) = result {
                 println!("创建新文件: {:?}", file.path());
@@ -116,12 +114,11 @@ impl MainWindow {
         let filter = gtk::FileFilter::new();
         filter.set_name(Some("文本文件"));
         filter.add_mime_type("text/plain");
-        
+
         let filters = gio::ListStore::new::<gtk::FileFilter>();
         filters.append(&filter);
         dialog.set_filters(Some(&filters));
 
-        let window = self.clone();
         dialog.open(Some(self), None::<&gio::Cancellable>, move |result| {
             if let Ok(file) = result {
                 println!("打开文件: {:?}", file.path());

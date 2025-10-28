@@ -1,7 +1,7 @@
 use adw::glib::Object;
 use adw::prelude::{ActionMapExt, AdwDialogExt};
 use adw::{AboutDialog, gio, glib};
-use gtk::prelude::{ApplicationExt, GtkApplicationExt, GtkWindowExt};
+use gtk::prelude::{ApplicationExt, GtkApplicationExt};
 
 mod imp {
     use adw::glib;
@@ -68,7 +68,7 @@ impl QtoolsApplication {
             .copyright("© 2025 Qinhuajun")
             .license_type(gtk::License::MitX11)
             .build();
-        
+
         // 获取当前活动窗口作为父窗口
         if let Some(window) = self.active_window() {
             about_dialog.present(Some(&window));
