@@ -29,18 +29,20 @@ mod imp {
             // 创建菜单模型
             let menu_model = gio::Menu::new();
 
-            // 添加菜单项
+            // 添加菜单项 - 使用 app. 前缀引用应用程序级别的动作
             let file_section = gio::Menu::new();
             file_section.append(Some("新建"), Some("win.new"));
             file_section.append(Some("打开"), Some("win.open"));
             file_section.append(Some("保存"), Some("win.save"));
 
             let edit_section = gio::Menu::new();
+            // preferences 现在是窗口级别动作
             edit_section.append(Some("首选项"), Some("win.preferences"));
 
             let help_section = gio::Menu::new();
-            help_section.append(Some("关于"), Some("win.about"));
-            help_section.append(Some("退出"), Some("win.quit"));
+            // 改为使用 app. 前缀引用应用程序级别的动作
+            help_section.append(Some("关于"), Some("app.about"));
+            help_section.append(Some("退出"), Some("app.quit"));
 
             menu_model.append_section(None, &file_section);
             menu_model.append_section(None, &edit_section);

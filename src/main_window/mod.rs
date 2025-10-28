@@ -5,7 +5,7 @@ mod sidebar;
 
 use crate::app::QtoolsApplication;
 use adw::glib::Object;
-use adw::prelude::{ActionMapExt, AdwDialogExt, ApplicationExt};
+use adw::prelude::{ActionMapExt, AdwDialogExt, ApplicationExt, FileExt};
 use adw::{AboutDialog, glib};
 use gtk::gio;
 use gtk::prelude::GtkWindowExt;
@@ -54,6 +54,8 @@ mod imp {
             obj.set_title(Some("Qtools"));
             obj.set_default_size(1024, 768);
             obj.set_content(Some(&overlay_view));
+            
+            // 在窗口构造完成后初始化窗口级别的动作
             obj.setup_actions();
         }
     }
@@ -77,13 +79,55 @@ impl MainWindow {
         Object::builder().property("application", app).build()
     }
 
-    // 动作处理函数
+    // 动作处理函数保留在窗口中，因为它们与特定窗口相关
     fn action_new(&self) {
-        println!("新建文件");
+        // 创建文件保存对话框
+        let dialog = gtk::FileDialog::builder()
+            .title("新建文件")
+            .modal(true)
+            .build();
+
+        // 添加文件过滤器
+        let filter = gtk::FileFilter::new();
+        filter.set_name(Some("文本文件"));
+        filter.add_mime_type("text/plain");
+        
+        let filters = gio::ListStore::new::<gtk::FileFilter>();
+        filters.append(&filter);
+        dialog.set_filters(Some(&filters));
+
+        let window = self.clone();
+        dialog.save(Some(self), None::<&gio::Cancellable>, move |result| {
+            if let Ok(file) = result {
+                println!("创建新文件: {:?}", file.path());
+                // 这里可以添加实际创建文件的逻辑
+            }
+        });
     }
 
     fn action_open(&self) {
-        println!("打开文件");
+        // 创建文件打开对话框
+        let dialog = gtk::FileDialog::builder()
+            .title("打开文件")
+            .modal(true)
+            .build();
+
+        // 添加文件过滤器
+        let filter = gtk::FileFilter::new();
+        filter.set_name(Some("文本文件"));
+        filter.add_mime_type("text/plain");
+        
+        let filters = gio::ListStore::new::<gtk::FileFilter>();
+        filters.append(&filter);
+        dialog.set_filters(Some(&filters));
+
+        let window = self.clone();
+        dialog.open(Some(self), None::<&gio::Cancellable>, move |result| {
+            if let Ok(file) = result {
+                println!("打开文件: {:?}", file.path());
+                // 这里可以添加实际打开文件的逻辑
+            }
+        });
     }
 
     fn action_save(&self) {
@@ -98,37 +142,15 @@ impl MainWindow {
         println!("打开首选项");
     }
 
-    fn action_about(&self) {
-        let about_dialog = AboutDialog::builder()
-            .application_name("QTools")
-            .application_icon("applications-development")
-            .developer_name("Qinhuajun")
-            .version("0.1.0")
-            .comments("一个基于 Rust 和 GTK 的实用工具集")
-            .website("https://github.com/qinhuajun/qtools")
-            .issue_url("https://github.com/qinhuajun/qtools/issues")
-            .developers(vec!["Qinhuajun https://github.com/qinhuajun"])
-            .copyright("© 2025 Qinhuajun")
-            .license_type(gtk::License::MitX11)
-            .build();
-        about_dialog.present(Some(self));
-    }
-
-    fn action_quit(&self) {
-        println!("退出应用");
-        self.application().unwrap().quit();
-    }
-
+    // 窗口级别的动作初始化方法
     pub fn setup_actions(&self) {
-        // 定义动作配置
+        // 定义窗口级动作配置
         let actions = vec![
             ("new", Self::action_new as fn(&_)),
             ("open", Self::action_open),
             ("save", Self::action_save),
             ("save-as", Self::action_save_as),
             ("preferences", Self::action_preferences),
-            ("about", Self::action_about),
-            ("quit", Self::action_quit),
         ];
 
         for (name, callback) in actions {
