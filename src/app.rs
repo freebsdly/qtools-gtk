@@ -1,5 +1,5 @@
 use adw::glib::Object;
-use adw::prelude::{ActionMapExt, AdwDialogExt};
+use adw::prelude::{ActionMapExt, AdwDialogExt, AlertDialogExt, AlertDialogExtManual};
 use adw::{AboutDialog, gio, glib};
 use gtk::prelude::{ApplicationExt, GtkApplicationExt};
 
@@ -79,8 +79,34 @@ impl QtoolsApplication {
     }
 
     fn action_quit(&self) {
-        println!("退出应用");
-        self.quit();
+        // 获取当前活动窗口作为父窗口
+        if let Some(window) = self.active_window() {
+            let dialog = adw::AlertDialog::builder()
+                .heading("确认退出")
+                .body("确定要退出应用吗？")
+                .build();
+
+            // 添加响应按钮
+            dialog.add_response("cancel", "取消");
+            dialog.set_default_response(Some("cancel"));
+            dialog.add_response("quit", "退出");
+            dialog.set_response_appearance("quit", adw::ResponseAppearance::Destructive);
+
+            // 克隆应用引用以便在闭包中使用
+            let app = self.clone();
+
+            // 连接响应信号
+            dialog.choose(&window.clone(), gio::Cancellable::NONE, move |response| {
+                if response == "quit" {
+                    println!("用户确认退出应用");
+                    app.quit();
+                }
+            });
+        } else {
+            // 如果没有活动窗口直接退出
+            println!("直接退出应用");
+            self.quit();
+        }
     }
 
     pub fn setup_actions(&self) {
@@ -98,5 +124,7 @@ impl QtoolsApplication {
             });
             self.add_action(&action);
         }
+
+        self.set_accels_for_action("app.quit", &["<Ctrl>q"]);
     }
 }

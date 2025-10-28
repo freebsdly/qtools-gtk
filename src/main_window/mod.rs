@@ -4,18 +4,22 @@ pub mod menu;
 mod sidebar;
 
 use crate::app::QtoolsApplication;
-use adw::glib;
 use adw::glib::Object;
-use adw::prelude::{ActionMapExt, FileExt};
+use adw::prelude::{
+    ActionMapExt, ActionRowExt, AdwDialogExt, ApplicationExt, FileExt, PreferencesGroupExt,
+    PreferencesPageExt,
+};
+use adw::{AboutDialog, Dialog, glib};
 use gtk::gio;
+use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
 mod imp {
     use crate::main_window::{content, sidebar};
-    use adw::glib;
-    use adw::prelude::AdwApplicationWindowExt;
+    use adw::prelude::{ActionMapExt, AdwApplicationWindowExt};
     use adw::subclass::prelude::{
         AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
+    use adw::{gio, glib};
     use gtk::prelude::{GtkWindowExt, WidgetExt};
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
 
@@ -95,6 +99,7 @@ impl MainWindow {
         filters.append(&filter);
         dialog.set_filters(Some(&filters));
 
+        let window = self.clone();
         dialog.save(Some(self), None::<&gio::Cancellable>, move |result| {
             if let Ok(file) = result {
                 println!("创建新文件: {:?}", file.path());
@@ -119,6 +124,7 @@ impl MainWindow {
         filters.append(&filter);
         dialog.set_filters(Some(&filters));
 
+        let window = self.clone();
         dialog.open(Some(self), None::<&gio::Cancellable>, move |result| {
             if let Ok(file) = result {
                 println!("打开文件: {:?}", file.path());
@@ -136,7 +142,41 @@ impl MainWindow {
     }
 
     fn action_preferences(&self) {
-        println!("打开首选项");
+        // 创建首选项对话框 (使用新的 AdwDialog API)
+        let preferences = Dialog::builder()
+            .title("首选项")
+            .content_width(600)
+            .content_height(500)
+            .build();
+
+        // 创建一个示例设置页面
+        let general_page = adw::PreferencesPage::new();
+        general_page.set_title("常规");
+        general_page.set_icon_name(Some("preferences-system-symbolic"));
+
+        let general_group = adw::PreferencesGroup::new();
+        general_group.set_title("常规设置");
+
+        // 添加示例设置项
+        let switch = gtk::Switch::new();
+        switch.set_valign(gtk::Align::Center);
+        switch.set_active(true);
+
+        let demo_row = adw::ActionRow::builder()
+            .title("示例设置")
+            .subtitle("这是一个示例设置项")
+            .activatable_widget(&switch)
+            .build();
+        demo_row.add_suffix(&switch);
+
+        general_group.add(&demo_row);
+        general_page.add(&general_group);
+
+        // 将页面添加到首选项对话框
+        preferences.set_child(Some(&general_page));
+
+        // 显示首选项对话框
+        preferences.present(Some(self));
     }
 
     // 窗口级别的动作初始化方法
@@ -157,6 +197,14 @@ impl MainWindow {
                 callback(&window);
             });
             self.add_action(&action);
+        }
+
+        // 获取应用程序引用以设置快捷键
+        if let Some(app) = self.application() {
+            // 注册窗口级快捷键
+            app.set_accels_for_action("win.new", &["<Ctrl>n"]);
+            app.set_accels_for_action("win.open", &["<Ctrl>o"]);
+            app.set_accels_for_action("win.save", &["<Ctrl>s"]);
         }
     }
 }

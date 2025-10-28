@@ -16,7 +16,6 @@ fn main() -> glib::ExitCode {
 
     // Connect to signals
     app.connect_startup(|app| {
-        setup_shortcuts(app);
         load_css();
     });
     app.connect_activate(|app| {
@@ -24,15 +23,6 @@ fn main() -> glib::ExitCode {
         main_window.present();
     });
     app.run()
-}
-
-fn setup_shortcuts(app: &QtoolsApplication) {
-    // 更新快捷键以匹配新的动作命名空间
-    app.set_accels_for_action("app.quit", &["<Ctrl>q"]);
-    // 其他快捷键保持不变
-    app.set_accels_for_action("win.filter('All')", &["<Ctrl>a"]);
-    app.set_accels_for_action("win.filter('Open')", &["<Ctrl>o"]);
-    app.set_accels_for_action("win.filter('Done')", &["<Ctrl>d"]);
 }
 
 fn load_css() {
