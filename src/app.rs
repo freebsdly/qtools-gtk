@@ -40,7 +40,7 @@ glib::wrapper! {
 }
 
 impl QtoolsApplication {
-    pub fn new() -> Self {
-        Object::builder().build()
+    pub fn new(app_id: &str) -> Self {
+        Object::builder().property("application-id", app_id).build()
     }
 }

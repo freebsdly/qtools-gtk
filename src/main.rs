@@ -12,7 +12,7 @@ use gtk::{CssProvider, gdk};
 const APP_ID: &str = "top.qinhuajun.app";
 
 fn main() -> glib::ExitCode {
-    let app = QtoolsApplication::new();
+    let app = QtoolsApplication::new(APP_ID);
 
     // Connect to signals
     app.connect_startup(|app| {
