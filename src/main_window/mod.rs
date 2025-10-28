@@ -9,17 +9,17 @@ use adw::prelude::{
     ActionMapExt, ActionRowExt, AdwDialogExt, ApplicationExt, FileExt, PreferencesGroupExt,
     PreferencesPageExt,
 };
-use adw::{AboutDialog, Dialog, glib};
+use adw::{glib, Dialog};
 use gtk::gio;
 use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
 mod imp {
     use crate::main_window::{content, sidebar};
-    use adw::prelude::{ActionMapExt, AdwApplicationWindowExt};
+    use adw::prelude::AdwApplicationWindowExt;
     use adw::subclass::prelude::{
         AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
-    use adw::{gio, glib};
+    use adw::glib;
     use gtk::prelude::{GtkWindowExt, WidgetExt};
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
 
