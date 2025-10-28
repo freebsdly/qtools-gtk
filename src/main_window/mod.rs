@@ -1,15 +1,14 @@
 // src/main_window/mod.rs
-pub mod about;
 mod content;
 pub mod menu;
 mod sidebar;
 
 use crate::app::QtoolsApplication;
-use adw::glib;
 use adw::glib::Object;
-use adw::prelude::ActionMapExt;
-use adw::subclass::prelude::ObjectSubclassIsExt;
+use adw::prelude::{ActionMapExt, AdwDialogExt, ApplicationExt};
+use adw::{AboutDialog, glib};
 use gtk::gio;
+use gtk::prelude::GtkWindowExt;
 
 mod imp {
     use crate::main_window::{content, sidebar};
@@ -100,11 +99,24 @@ impl MainWindow {
     }
 
     fn action_about(&self) {
-        // about::AppAboutDialog::show(window);
+        let about_dialog = AboutDialog::builder()
+            .application_name("QTools")
+            .application_icon("applications-development")
+            .developer_name("Qinhuajun")
+            .version("0.1.0")
+            .comments("一个基于 Rust 和 GTK 的实用工具集")
+            .website("https://github.com/qinhuajun/qtools")
+            .issue_url("https://github.com/qinhuajun/qtools/issues")
+            .developers(vec!["Qinhuajun https://github.com/qinhuajun"])
+            .copyright("© 2025 Qinhuajun")
+            .license_type(gtk::License::MitX11)
+            .build();
+        about_dialog.present(Some(self));
     }
 
     fn action_quit(&self) {
         println!("退出应用");
+        self.application().unwrap().quit();
     }
 
     pub fn setup_actions(&self) {
