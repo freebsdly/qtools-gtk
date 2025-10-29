@@ -9,7 +9,7 @@ use adw::prelude::{
     ActionMapExt, ActionRowExt, AdwDialogExt, FileExt, PreferencesGroupExt, PreferencesPageExt,
 };
 use adw::subclass::prelude::ObjectSubclassIsExt;
-use adw::{Dialog, glib};
+use adw::{glib, Dialog};
 use gtk::gio;
 use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
@@ -20,11 +20,9 @@ mod imp {
     use adw::subclass::prelude::{
         AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
-    use adw::{Breakpoint, BreakpointCondition, BreakpointConditionLengthType, LengthUnit, glib};
-    use gtk::SizeRequestMode::ConstantSize;
+    use adw::{glib, Breakpoint, BreakpointCondition, BreakpointConditionLengthType, LengthUnit};
     use gtk::prelude::{GtkWindowExt, WidgetExt};
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
-    use log::info;
     use std::cell::RefCell;
 
     #[derive(Default)]
@@ -71,6 +69,8 @@ mod imp {
             let obj = self.obj();
             obj.set_title(Some("Qtools"));
             obj.set_default_size(1024, 768);
+            // 设置最小宽度和高度
+            obj.set_size_request(600, 400);
             obj.set_content(Some(&breakpoint_bin));
 
             // 创建断点 - 当窗口宽度小于 768px 时折叠侧边栏
