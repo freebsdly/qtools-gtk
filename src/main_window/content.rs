@@ -96,7 +96,7 @@ impl MainContent {
             button.connect_clicked(move |_| {
                 let collapsed = overlay_split_view.is_collapsed();
                 overlay_split_view.set_collapsed(!collapsed);
-                
+
                 // 根据侧边栏状态更新按钮图标
                 if collapsed {
                     button_clone.set_icon_name("sidebar-show-symbolic");

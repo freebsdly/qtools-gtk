@@ -12,6 +12,8 @@ use gtk::{CssProvider, gdk};
 const APP_ID: &str = "top.qinhuajun.app";
 
 fn main() -> glib::ExitCode {
+    pretty_env_logger::init();
+
     let app = QtoolsApplication::new(APP_ID);
 
     // Connect to signals
