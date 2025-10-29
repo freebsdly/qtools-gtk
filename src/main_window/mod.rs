@@ -10,6 +10,7 @@ use adw::prelude::{
     PreferencesPageExt,
 };
 use adw::{glib, Dialog};
+use adw::subclass::prelude::ObjectSubclassIsExt;
 use gtk::gio;
 use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
@@ -22,9 +23,12 @@ mod imp {
     use adw::glib;
     use gtk::prelude::{GtkWindowExt, WidgetExt};
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
+    use std::cell::RefCell;
 
     #[derive(Default)]
-    pub struct MainWindow {}
+    pub struct MainWindow {
+        pub overlay_view: RefCell<Option<adw::OverlaySplitView>>,
+    }
 
     #[glib::object_subclass]
     impl ObjectSubclass for MainWindow {
@@ -50,6 +54,9 @@ mod imp {
                 .max_sidebar_width(300.0)
                 .build();
 
+            // 保存overlay_view的引用
+            self.overlay_view.replace(Some(overlay_view.clone()));
+
             // 设置分割视图垂直扩展以填满可用空间
             overlay_view.set_vexpand(true);
 
@@ -60,6 +67,9 @@ mod imp {
 
             // 在窗口构造完成后初始化窗口级别的动作
             obj.setup_actions();
+            
+            // 设置侧边栏切换按钮事件处理器
+            main_content.setup_sidebar_toggle(overlay_view);
         }
     }
 
@@ -80,6 +90,11 @@ glib::wrapper! {
 impl MainWindow {
     pub fn new(app: &QtoolsApplication) -> Self {
         Object::builder().property("application", app).build()
+    }
+
+    // 获取OverlaySplitView的引用
+    pub fn overlay_view(&self) -> Option<adw::OverlaySplitView> {
+        self.imp().overlay_view.borrow().clone()
     }
 
     // 动作处理函数保留在窗口中，因为它们与特定窗口相关
