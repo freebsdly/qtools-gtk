@@ -8,7 +8,7 @@ mod imp {
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
     use adw::{glib, HeaderBar, ToolbarView};
-    use gtk::prelude::WidgetExt;
+    use gtk::prelude::{BoxExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation, PolicyType, ScrolledWindow};
 
@@ -35,11 +35,41 @@ mod imp {
 
             sidebar_header.add_css_class("header-bar");
 
+            // 创建工具按钮
+            let new_button = gtk::Button::from_icon_name("document-new-symbolic");
+            new_button.set_tooltip_text(Some("新建"));
+            new_button.add_css_class("flat");
+
+            let open_button = gtk::Button::from_icon_name("document-open-symbolic");
+            open_button.set_tooltip_text(Some("打开"));
+            open_button.add_css_class("flat");
+
+            let save_button = gtk::Button::from_icon_name("document-save-symbolic");
+            save_button.set_tooltip_text(Some("保存"));
+            save_button.add_css_class("flat");
+
+            // 创建工具栏按钮容器
+            let toolbar_box = gtk::Box::builder()
+                .orientation(Orientation::Vertical)
+                .spacing(6)
+                .margin_start(6)
+                .margin_end(6)
+                .margin_top(6)
+                .margin_bottom(6)
+                .build();
+
+            toolbar_box.append(&new_button);
+            toolbar_box.append(&open_button);
+            toolbar_box.append(&save_button);
+
             // 创建侧边栏内容
             let sidebar_content = gtk::Box::builder()
                 .orientation(Orientation::Vertical)
                 .spacing(10)
                 .build();
+
+            // 添加工具栏到侧边栏内容顶部
+            sidebar_content.append(&toolbar_box);
 
             // 为侧边栏内容添加CSS类
             sidebar_content.add_css_class("main-toolbar");

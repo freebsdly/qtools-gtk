@@ -1,13 +1,12 @@
 #![windows_subsystem = "windows"]
 
-mod ai_chat;
 mod app;
-mod main_window;
+mod components;
 
 use adw::prelude::*;
 use app::QtoolsApplication;
 use gtk::glib;
-use gtk::{CssProvider, gdk};
+use gtk::{gdk, CssProvider};
 
 const APP_ID: &str = "top.qinhuajun.app";
 
@@ -21,7 +20,7 @@ fn main() -> glib::ExitCode {
         load_css();
     });
     app.connect_activate(|app| {
-        let main_window = main_window::MainWindow::new(app);
+        let main_window = components::main_window::MainWindow::new(app);
         main_window.present();
     });
     app.run()

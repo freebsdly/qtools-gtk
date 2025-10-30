@@ -4,8 +4,8 @@ use adw::{glib, NavigationPage};
 use gtk::prelude::ButtonExt;
 
 mod imp {
-    use crate::main_window::menu::AppMenu;
-    use crate::main_window::sidebar;
+    use crate::components::main_window::menu::AppMenu;
+    use crate::components::main_window::sidebar;
     use adw::prelude::{BreakpointBinExt, NavigationPageExt, ToValue};
     use adw::subclass::prelude::{
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,

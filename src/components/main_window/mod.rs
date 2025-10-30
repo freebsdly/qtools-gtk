@@ -14,7 +14,7 @@ use gtk::gio;
 use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
 mod imp {
-    use crate::main_window::{content, toolbar};
+    use crate::components::main_window::{content, toolbar};
     use adw::glib;
     use adw::prelude::AdwApplicationWindowExt;
     use adw::subclass::prelude::{
