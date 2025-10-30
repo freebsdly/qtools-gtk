@@ -2,33 +2,29 @@
 mod content;
 pub mod menu;
 mod sidebar;
+mod toolbar;
 
 use crate::app::QtoolsApplication;
 use adw::glib::Object;
 use adw::prelude::{
     ActionMapExt, ActionRowExt, AdwDialogExt, FileExt, PreferencesGroupExt, PreferencesPageExt,
 };
-use adw::subclass::prelude::ObjectSubclassIsExt;
 use adw::{glib, Dialog};
 use gtk::gio;
 use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
 mod imp {
-    use crate::main_window::{content, sidebar};
-    use adw::prelude::BreakpointBinExt;
-    use adw::prelude::{AdwApplicationWindowExt, ToValue};
+    use crate::main_window::{content, toolbar};
+    use adw::glib;
+    use adw::prelude::AdwApplicationWindowExt;
     use adw::subclass::prelude::{
         AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
-    use adw::{glib, Breakpoint, BreakpointCondition, BreakpointConditionLengthType, LengthUnit};
     use gtk::prelude::{GtkWindowExt, WidgetExt};
     use gtk::subclass::prelude::{ApplicationWindowImpl, WidgetImpl, WindowImpl};
-    use std::cell::RefCell;
 
     #[derive(Default)]
-    pub struct MainWindow {
-        pub breakpoint_bin: RefCell<Option<adw::BreakpointBin>>,
-    }
+    pub struct MainWindow {}
 
     #[glib::object_subclass]
     impl ObjectSubclass for MainWindow {
@@ -40,57 +36,32 @@ mod imp {
     impl ObjectImpl for MainWindow {
         fn constructed(&self) {
             self.parent_constructed();
-            let sidebar = sidebar::MainSidebar::new();
 
-            // 创建主要内容区域
             let main_content = content::MainContent::new();
 
-            // 创建 BreakpointBin 容器
-            let breakpoint_bin = adw::BreakpointBin::builder().build();
-
-            // 保存 breakpoint_bin 的引用
-            self.breakpoint_bin.replace(Some(breakpoint_bin.clone()));
+            let toolbar = toolbar::MainToolbar::new();
 
             // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
-            let overlay_view = adw::OverlaySplitView::builder()
-                .sidebar(&sidebar)
+            let nav_view = adw::NavigationSplitView::builder()
+                .sidebar(&toolbar)
                 .content(&main_content)
                 .collapsed(false) // 默认展开
-                .min_sidebar_width(200.0) // 最小宽度设为200，足够显示图标
-                .max_sidebar_width(300.0)
+                .min_sidebar_width(48.0)
+                .max_sidebar_width(48.0)
                 .build();
 
             // 设置分割视图垂直扩展以填满可用空间
-            overlay_view.set_vexpand(true);
-
-            // 将 overlay_view 添加到 breakpoint_bin 中
-            breakpoint_bin.set_child(Some(&overlay_view));
+            nav_view.set_vexpand(true);
 
             let obj = self.obj();
             obj.set_title(Some("Qtools"));
             obj.set_default_size(1024, 768);
             // 设置最小宽度和高度
             obj.set_size_request(600, 400);
-            obj.set_content(Some(&breakpoint_bin));
-
-            // 创建断点 - 当窗口宽度小于 768px 时折叠侧边栏
-            let breakpoint = Breakpoint::new(BreakpointCondition::new_length(
-                BreakpointConditionLengthType::MaxWidth,
-                768.0,
-                LengthUnit::Px,
-            ));
-
-            // 为断点添加条件应用的属性
-            breakpoint.add_setter(&overlay_view, "collapsed", Option::from(&true.to_value()));
-
-            // 将断点添加到 breakpoint_bin
-            breakpoint_bin.add_breakpoint(breakpoint);
+            obj.set_content(Some(&nav_view));
 
             // 在窗口构造完成后初始化窗口级别的动作
             obj.setup_actions();
-
-            // 设置侧边栏切换按钮事件处理器
-            main_content.setup_sidebar_toggle(overlay_view);
         }
     }
 
@@ -111,11 +82,6 @@ glib::wrapper! {
 impl MainWindow {
     pub fn new(app: &QtoolsApplication) -> Self {
         Object::builder().property("application", app).build()
-    }
-
-    // 获取BreakpointBin的引用
-    pub fn breakpoint_bin(&self) -> Option<adw::BreakpointBin> {
-        self.imp().breakpoint_bin.borrow().clone()
     }
 
     // 动作处理函数保留在窗口中，因为它们与特定窗口相关

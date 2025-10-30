@@ -1,15 +1,19 @@
-use adw::glib::{Object, clone};
+use adw::glib::Object;
 use adw::subclass::prelude::ObjectSubclassIsExt;
-use adw::{NavigationPage, glib};
+use adw::{glib, NavigationPage};
 use gtk::prelude::ButtonExt;
 
 mod imp {
     use crate::main_window::menu::AppMenu;
-    use adw::prelude::NavigationPageExt;
+    use crate::main_window::sidebar;
+    use adw::prelude::{BreakpointBinExt, NavigationPageExt, ToValue};
     use adw::subclass::prelude::{
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
-    use adw::{HeaderBar, NavigationPage, ToolbarView, glib};
+    use adw::{
+        glib, Breakpoint, BreakpointCondition, BreakpointConditionLengthType, HeaderBar,
+        LengthUnit, NavigationPage, ToolbarView,
+    };
     use gtk::prelude::{BoxExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation};
@@ -18,6 +22,7 @@ mod imp {
     #[derive(Default)]
     pub struct MainContent {
         pub sidebar_toggle_button: RefCell<Option<gtk::Button>>,
+        pub breakpoint_bin: RefCell<Option<adw::BreakpointBin>>,
     }
 
     #[glib::object_subclass]
@@ -51,8 +56,15 @@ mod imp {
             // 将菜单按钮添加到标题栏的开始位置
             content_header.pack_start(&sidebar_toggle_button);
             content_header.pack_end(&app_menu);
-
             content_header.add_css_class("header-bar");
+
+            // 创建 BreakpointBin 容器
+            let breakpoint_bin = adw::BreakpointBin::builder().build();
+
+            // 保存 breakpoint_bin 的引用
+            self.breakpoint_bin.replace(Some(breakpoint_bin.clone()));
+
+            let sidebar = sidebar::MainSidebar::new();
 
             // 创建主要内容区域
             let main_content = gtk::Box::builder()
@@ -60,12 +72,35 @@ mod imp {
                 .spacing(10)
                 .build();
             main_content.append(&Label::new(Some("主要内容区域")));
-
             // 为主要内容区域添加CSS类
             main_content.add_css_class("main-content");
+            //
+            // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
+            let overlay_view = adw::OverlaySplitView::builder()
+                .sidebar(&sidebar)
+                .content(&main_content)
+                .collapsed(false) // 默认展开
+                .min_sidebar_width(300.0)
+                .max_sidebar_width(300.0)
+                .build();
+
+            // 设置分割视图垂直扩展以填满可用空间
+            overlay_view.set_vexpand(true);
+            // 将 overlay_view 添加到 breakpoint_bin 中
+            breakpoint_bin.set_child(Some(&overlay_view));
+            // 创建断点 - 当窗口宽度小于 768px 时折叠侧边栏
+            let breakpoint = Breakpoint::new(BreakpointCondition::new_length(
+                BreakpointConditionLengthType::MaxWidth,
+                768.0,
+                LengthUnit::Px,
+            ));
+            // 为断点添加条件应用的属性
+            breakpoint.add_setter(&overlay_view, "collapsed", Option::from(&true.to_value()));
+            // 将断点添加到 breakpoint_bin
+            breakpoint_bin.add_breakpoint(breakpoint);
 
             // 创建工具栏视图
-            let toolbar_view = ToolbarView::builder().content(&main_content).build();
+            let toolbar_view = ToolbarView::builder().content(&breakpoint_bin).build();
 
             toolbar_view.add_top_bar(&content_header);
 

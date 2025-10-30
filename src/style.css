@@ -17,13 +17,8 @@
     border-radius: 8px;
 }
 
-.toolbar {
-    background-color: #f6f6f6;
-    border-radius: 8px;
-    padding: 5px;
-}
 
-.toolbar button.compact {
+.main-toolbar {
     min-width: 0;
     padding: 0;
     margin: 2px 0;
