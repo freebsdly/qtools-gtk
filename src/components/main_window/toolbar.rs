@@ -3,22 +3,22 @@ use adw::{glib, NavigationPage};
 
 mod imp {
     use super::*;
+    use adw::glib::clone::Downgrade;
     use adw::prelude::ButtonExt;
     use adw::prelude::NavigationPageExt;
     use adw::subclass::prelude::{
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
     use adw::{glib, HeaderBar, ToolbarView};
-    use gtk::prelude::{BoxExt, WidgetExt};
+    use gtk::prelude::{BoxExt, ToggleButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
-    use gtk::{Label, Orientation, PolicyType, ScrolledWindow};
+    use gtk::{Label, Orientation, PolicyType, ScrolledWindow, ToggleButton};
     use std::cell::RefCell;
-    use adw::glib::clone::Downgrade;
 
     #[derive(Default)]
     pub struct MainToolbar {
         // 存储按钮引用，以便管理选中状态
-        pub buttons: RefCell<Vec<gtk::Button>>,
+        pub buttons: RefCell<Vec<ToggleButton>>,
     }
 
     #[glib::object_subclass]
@@ -52,35 +52,9 @@ mod imp {
                 .build();
 
             // 创建带图标大小的按钮
-            let new_button = gtk::Button::new();
-            let new_image = gtk::Image::from_icon_name("document-new-symbolic");
-            new_image.set_icon_size(gtk::IconSize::Large);
-            new_button.set_child(Some(&new_image));
-            new_button.set_tooltip_text(Some("新建"));
-            new_button.add_css_class("flat");
-            new_button.add_css_class("toolbar-button");
-            new_button.set_can_shrink(false);
-            new_button.set_size_request(48, 48);
-
-            let open_button = gtk::Button::new();
-            let open_image = gtk::Image::from_icon_name("document-open-symbolic");
-            open_image.set_icon_size(gtk::IconSize::Large);
-            open_button.set_child(Some(&open_image));
-            open_button.set_tooltip_text(Some("打开"));
-            open_button.add_css_class("flat");
-            open_button.add_css_class("toolbar-button");
-            open_button.set_can_shrink(false);
-            open_button.set_size_request(48, 48);
-
-            let save_button = gtk::Button::new();
-            let save_image = gtk::Image::from_icon_name("document-save-symbolic");
-            save_image.set_icon_size(gtk::IconSize::Large);
-            save_button.set_child(Some(&save_image));
-            save_button.set_tooltip_text(Some("保存"));
-            save_button.add_css_class("flat");
-            save_button.add_css_class("toolbar-button");
-            save_button.set_can_shrink(false);
-            save_button.set_size_request(48, 48);
+            let new_button = create_toolbar_button("document-new-symbolic", "新建");
+            let open_button = create_toolbar_button("document-open-symbolic", "打开");
+            let save_button = create_toolbar_button("document-save-symbolic", "保存");
 
             // 存储按钮引用
             self.buttons.borrow_mut().push(new_button.clone());
@@ -91,6 +65,9 @@ mod imp {
             setup_button_click_handler(&new_button, self.buttons.clone());
             setup_button_click_handler(&open_button, self.buttons.clone());
             setup_button_click_handler(&save_button, self.buttons.clone());
+
+            // 设置默认选中第一个按钮
+            new_button.set_active(true);
 
             toolbar_box.append(&new_button);
             toolbar_box.append(&open_button);
@@ -125,19 +102,33 @@ mod imp {
     }
 
     // 添加按钮点击处理器，用于切换选中状态
-    fn setup_button_click_handler(button: &gtk::Button, buttons: RefCell<Vec<gtk::Button>>) {
+    fn setup_button_click_handler(button: &ToggleButton, buttons: RefCell<Vec<ToggleButton>>) {
         let button_weak = button.downgrade();
         button.connect_clicked(move |_| {
             if let Some(btn) = button_weak.upgrade() {
-                // 清除所有按钮的选中状态
+                // 清除其他按钮的选中状态
                 for b in buttons.borrow().iter() {
-                    b.remove_css_class("checked");
+                    if b != &btn {
+                        b.set_active(false);
+                    }
                 }
-                
-                // 设置当前按钮为选中状态
-                btn.add_css_class("checked");
+
+                // 确保当前按钮被选中
+                btn.set_active(true);
             }
         });
+    }
+
+    // 创建工具栏按钮的辅助函数
+    fn create_toolbar_button(icon_name: &str, tooltip: &str) -> ToggleButton {
+        let button = ToggleButton::new();
+        let image = gtk::Image::from_icon_name(icon_name);
+        image.set_icon_size(gtk::IconSize::Large);
+        button.set_child(Some(&image));
+        button.set_tooltip_text(Some(tooltip));
+        button.add_css_class("toolbar-button");
+        button.set_can_shrink(false);
+        button
     }
 
     // Trait shared by all widgets
