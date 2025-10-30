@@ -56,6 +56,7 @@ mod imp {
             let obj = self.obj();
             obj.set_title(Some("Qtools"));
             obj.set_default_size(1024, 768);
+            obj.set_maximized(true);
             // 设置最小宽度和高度
             obj.set_size_request(600, 400);
             obj.set_content(Some(&nav_view));

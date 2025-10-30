@@ -105,6 +105,8 @@ mod imp {
             toolbar_view.add_top_bar(&content_header);
 
             self.obj().set_child(Some(&toolbar_view));
+
+            self.obj().setup_sidebar_toggle(overlay_view);
         }
     }
 
