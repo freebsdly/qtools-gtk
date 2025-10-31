@@ -1,4 +1,5 @@
 use adw::glib::Object;
+use adw::subclass::prelude::ObjectSubclassIsExt;
 use adw::{glib, NavigationPage};
 
 mod imp {
@@ -32,7 +33,12 @@ mod imp {
     impl ObjectImpl for MainToolbar {
         fn constructed(&self) {
             self.parent_constructed();
+            self.create_toolbar();
+        }
+    }
 
+    impl MainToolbar {
+        fn create_toolbar(&self) {
             // 创建侧边栏标题栏
             let sidebar_header = HeaderBar::builder()
                 .title_widget(&Label::new(Some("")))
@@ -56,15 +62,18 @@ mod imp {
             let open_button = create_toolbar_button("document-open-symbolic", "打开");
             let save_button = create_toolbar_button("document-save-symbolic", "保存");
 
+            let obj = self.obj();
+            let buttons_ref = &obj.imp().buttons;
+
             // 存储按钮引用
-            self.buttons.borrow_mut().push(new_button.clone());
-            self.buttons.borrow_mut().push(open_button.clone());
-            self.buttons.borrow_mut().push(save_button.clone());
+            buttons_ref.borrow_mut().push(new_button.clone());
+            buttons_ref.borrow_mut().push(open_button.clone());
+            buttons_ref.borrow_mut().push(save_button.clone());
 
             // 添加按钮点击事件处理，实现选中效果
-            setup_button_click_handler(&new_button, self.buttons.clone());
-            setup_button_click_handler(&open_button, self.buttons.clone());
-            setup_button_click_handler(&save_button, self.buttons.clone());
+            setup_button_click_handler(&new_button, buttons_ref.clone());
+            setup_button_click_handler(&open_button, buttons_ref.clone());
+            setup_button_click_handler(&save_button, buttons_ref.clone());
 
             // 设置默认选中第一个按钮
             new_button.set_active(true);
@@ -96,7 +105,6 @@ mod imp {
             let toolbar_view = ToolbarView::builder().content(&sidebar_scroll).build();
 
             toolbar_view.add_top_bar(&sidebar_header);
-
             self.obj().set_child(Some(&toolbar_view));
         }
     }

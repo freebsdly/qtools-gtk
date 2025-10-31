@@ -3,11 +3,11 @@ use adw::{glib, NavigationPage};
 
 mod imp {
     use super::*;
+    use adw::glib;
     use adw::prelude::NavigationPageExt;
     use adw::subclass::prelude::{
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
-    use adw::glib;
     use gtk::prelude::WidgetExt;
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Orientation, PolicyType, ScrolledWindow};
@@ -26,7 +26,12 @@ mod imp {
     impl ObjectImpl for MainSidebar {
         fn constructed(&self) {
             self.parent_constructed();
+            self.create_sidebar();
+        }
+    }
 
+    impl MainSidebar {
+        fn create_sidebar(&self) {
             // 创建侧边栏内容
             let sidebar_content = gtk::Box::builder()
                 .orientation(Orientation::Vertical)

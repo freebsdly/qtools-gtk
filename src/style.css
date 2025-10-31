@@ -69,3 +69,18 @@ box.main-toolbar {
 
 /* GTK不支持@media查询，深色主题由系统自动处理 */
 /* 您可以在应用中通过Adw.StyleManager手动控制主题 */
+
+/* 欢迎页面样式 */
+.title-1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.heading {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.body {
+    font-size: 14px;
+}

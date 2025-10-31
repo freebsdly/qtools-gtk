@@ -6,6 +6,7 @@ use gtk::prelude::ButtonExt;
 mod imp {
     use crate::components::main_window::menu::AppMenu;
     use crate::components::main_window::sidebar;
+    use crate::components::welcome::WelcomePage;
     use adw::prelude::{BreakpointBinExt, NavigationPageExt, ToValue};
     use adw::subclass::prelude::{
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
@@ -35,6 +36,12 @@ mod imp {
     impl ObjectImpl for MainContent {
         fn constructed(&self) {
             self.parent_constructed();
+            self.create_content();
+        }
+    }
+
+    impl MainContent {
+        fn create_content(&self) {
             // 创建菜单
             let app_menu = AppMenu::new();
 
@@ -66,12 +73,15 @@ mod imp {
 
             let sidebar = sidebar::MainSidebar::new();
 
+            // 创建欢迎页面
+            let welcome_page = WelcomePage::new();
+
             // 创建主要内容区域
             let main_content = gtk::Box::builder()
                 .orientation(Orientation::Vertical)
                 .spacing(10)
                 .build();
-            main_content.append(&Label::new(Some("主要内容区域")));
+            main_content.append(&welcome_page);
             // 为主要内容区域添加CSS类
             main_content.add_css_class("main-content");
             //

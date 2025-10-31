@@ -36,7 +36,12 @@ mod imp {
     impl ObjectImpl for MainWindow {
         fn constructed(&self) {
             self.parent_constructed();
+            self.create_main_window();
+        }
+    }
 
+    impl MainWindow {
+        fn create_main_window(&self) {
             let main_content = content::MainContent::new();
 
             let toolbar = toolbar::MainToolbar::new();
