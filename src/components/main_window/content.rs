@@ -15,7 +15,7 @@ mod imp {
         glib, Breakpoint, BreakpointCondition, BreakpointConditionLengthType, HeaderBar,
         LengthUnit, NavigationPage, ToolbarView,
     };
-    use gtk::prelude::{BoxExt, WidgetExt};
+    use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation};
     use std::cell::RefCell;
@@ -89,7 +89,7 @@ mod imp {
             let overlay_view = adw::OverlaySplitView::builder()
                 .sidebar(&sidebar)
                 .content(&main_content)
-                .collapsed(false) // 默认展开
+                .collapsed(true) // 默认收起侧边栏
                 .min_sidebar_width(300.0)
                 .max_sidebar_width(300.0)
                 .build();
@@ -117,6 +117,11 @@ mod imp {
             self.obj().set_child(Some(&toolbar_view));
 
             self.obj().setup_sidebar_toggle(overlay_view);
+
+            // 更新侧边栏按钮图标状态
+            if let Some(button) = &*self.sidebar_toggle_button.borrow() {
+                button.set_icon_name("sidebar-show-symbolic");
+            }
         }
     }
 

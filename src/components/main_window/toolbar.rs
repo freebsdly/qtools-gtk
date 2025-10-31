@@ -75,9 +75,6 @@ mod imp {
             setup_button_click_handler(&open_button, buttons_ref.clone());
             setup_button_click_handler(&save_button, buttons_ref.clone());
 
-            // 设置默认选中第一个按钮
-            new_button.set_active(true);
-
             toolbar_box.append(&new_button);
             toolbar_box.append(&open_button);
             toolbar_box.append(&save_button);
