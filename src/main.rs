@@ -5,6 +5,7 @@ mod components;
 
 use adw::prelude::*;
 use app::QtoolsApplication;
+use components::tutorial::TutorialDialog;
 use gtk::glib;
 use gtk::{gdk, CssProvider};
 
@@ -20,8 +21,15 @@ fn main() -> glib::ExitCode {
         load_css();
     });
     app.connect_activate(|app| {
+        // 创建并显示引导页
+        let tutorial_dialog = TutorialDialog::new();
+
+        // 创建主窗口
         let main_window = components::main_window::MainWindow::new(app);
         main_window.present();
+
+        // 在主窗口上显示引导页模态框
+        AdwDialogExt::present(&tutorial_dialog, Some(&main_window));
     });
     app.run()
 }
