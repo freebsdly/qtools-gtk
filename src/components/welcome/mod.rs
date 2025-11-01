@@ -93,6 +93,29 @@ mod imp {
                 features_list.append(&feature_label);
             }
 
+            // 添加开始使用按钮
+            let start_button = gtk::Button::builder()
+                .label("开始使用")
+                .css_classes(["suggested-action", "pill"])
+                .margin_top(24)
+                .build();
+
+            let carousel_box = self.create_carousel();
+
+            // 将所有组件添加到欢迎页面容器中
+            welcome_box.append(&banner);
+            welcome_box.append(&title);
+            welcome_box.append(&description);
+            welcome_box.append(&features_title);
+            welcome_box.append(&features_list);
+            welcome_box.append(&start_button);
+            welcome_box.append(&carousel_box);
+
+            // 设置欢迎页面内容
+            self.obj().set_child(Some(&welcome_box));
+        }
+
+        fn create_carousel(&self) -> gtk::Box {
             let carousel_box = gtk::Box::builder()
                 .orientation(Orientation::Vertical)
                 .spacing(12)
@@ -101,14 +124,6 @@ mod imp {
                 .valign(gtk::Align::Fill)
                 .halign(gtk::Align::Fill)
                 .build();
-
-            // 添加开始使用按钮
-            let start_button = gtk::Button::builder()
-                .label("开始使用")
-                .css_classes(["suggested-action", "pill"])
-                .margin_top(24)
-                .build();
-
             // 创建 Carousel
             let carousel = adw::Carousel::builder()
                 .allow_scroll_wheel(true)
@@ -208,17 +223,7 @@ mod imp {
             carousel_box.append(&carousel);
             carousel_box.append(&indicator_lines);
 
-            // 将所有组件添加到欢迎页面容器中
-            welcome_box.append(&banner);
-            welcome_box.append(&title);
-            welcome_box.append(&description);
-            welcome_box.append(&features_title);
-            welcome_box.append(&features_list);
-            welcome_box.append(&start_button);
-            welcome_box.append(&carousel_box);
-
-            // 设置欢迎页面内容
-            self.obj().set_child(Some(&welcome_box));
+            carousel_box
         }
     }
 
