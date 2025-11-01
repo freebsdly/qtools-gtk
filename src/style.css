@@ -84,3 +84,10 @@ box.main-toolbar {
 .body {
     font-size: 14px;
 }
+
+/* AI聊天样式 */
+.ai-chat {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 8px;
+}
