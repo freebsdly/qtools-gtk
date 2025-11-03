@@ -26,8 +26,8 @@ mod imp {
     // 定义工具栏按钮的动作类型
     #[derive(Debug, Clone)]
     enum ToolbarAction {
-        Signal(&'static str),  // 发送信号
-        Toggle,                // 切换选中状态
+        Signal(&'static str), // 发送信号
+        Toggle,               // 切换选中状态
     }
 
     #[derive(Default)]
@@ -112,10 +112,13 @@ mod imp {
 
                 match button_config.action {
                     ToolbarAction::Signal(signal_name) => {
-                        let obj_clone = obj.clone();
-                        button.connect_clicked(move |_| {
-                            obj_clone.emit_by_name::<()>(signal_name, &[]);
-                        });
+                        button.connect_clicked(clone!(
+                            #[weak]
+                            obj,
+                            move |_| {
+                                obj.emit_by_name::<()>(signal_name, &[]);
+                            }
+                        ));
                     }
                     ToolbarAction::Toggle => {
                         setup_button_click_handler(&button, buttons_ref.clone());
