@@ -53,16 +53,16 @@ pub static TOOLBAR_BUTTONS: Lazy<Vec<ToolbarButton>> = Lazy::new(|| {
         ToolbarButton {
             icon_name: "document-open-symbolic",
             tooltip: "打开",
-            action: ToolbarAction::Toggle,
-            content_action: None,
-            signal_flags: None,
+            action: ToolbarAction::Signal("show-welcome"),
+            content_action: Some(ContentAction::ShowWelcome),
+            signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
         },
         ToolbarButton {
             icon_name: "document-save-symbolic",
             tooltip: "保存",
-            action: ToolbarAction::Toggle,
-            content_action: None,
-            signal_flags: None,
+            action: ToolbarAction::Signal("show-welcome-save"),
+            content_action: Some(ContentAction::ShowWelcome),
+            signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
         },
     ]
 });

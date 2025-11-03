@@ -54,27 +54,36 @@ mod imp {
 
             // 根据配置表动态连接信号
             for button_config in TOOLBAR_BUTTONS.iter() {
-                if let ToolbarAction::Signal(signal_name) = button_config.action {
-                    // 使用 glib::clone! 宏和 weak 引用来改写信号连接
-                    toolbar.connect_local(
-                        signal_name,
-                        false,
-                        clone!(
-                            #[weak]
-                            main_content,
-                            #[upgrade_or_panic]
-                            move |_| {
-                                // 根据 content_action 执行不同动作
-                                if let Some(content_action) = &button_config.content_action {
-                                    match content_action {
-                                        ContentAction::ShowAIChat => main_content.show_ai_chat(),
-                                        ContentAction::ShowWelcome => main_content.show_welcome(),
+                match &button_config.action {
+                    ToolbarAction::Signal(signal_name) => {
+                        // 使用 glib::clone! 宏和 weak 引用来改写信号连接
+                        toolbar.connect_local(
+                            signal_name,
+                            false,
+                            clone!(
+                                #[weak]
+                                main_content,
+                                #[upgrade_or_panic]
+                                move |_| {
+                                    // 根据 content_action 执行不同动作
+                                    if let Some(content_action) = &button_config.content_action {
+                                        match content_action {
+                                            ContentAction::ShowAIChat => {
+                                                main_content.show_ai_chat()
+                                            }
+                                            ContentAction::ShowWelcome => {
+                                                main_content.show_welcome()
+                                            }
+                                        }
                                     }
+                                    None
                                 }
-                                None
-                            }
-                        ),
-                    );
+                            ),
+                        );
+                    }
+                    ToolbarAction::Toggle => {
+                        // Toggle 类型按钮不需要连接信号
+                    }
                 }
             }
 
