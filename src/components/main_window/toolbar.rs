@@ -5,6 +5,7 @@ use adw::NavigationPage;
 
 mod imp {
     use super::*;
+    use crate::components::main_window::toolbar_config::{ToolbarAction, TOOLBAR_BUTTONS};
     use adw::glib::clone;
     use adw::prelude::NavigationPageExt;
     use adw::prelude::{ButtonExt, ObjectExt};
@@ -14,53 +15,12 @@ mod imp {
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation, PolicyType, ScrolledWindow, ToggleButton};
     use std::cell::RefCell;
-    use once_cell::sync::Lazy;
-
-    // 定义工具栏按钮的结构体
-    #[derive(Debug, Clone)]
-    struct ToolbarButton {
-        icon_name: &'static str,
-        tooltip: &'static str,
-        action: ToolbarAction,
-        signal_flags: Option<glib::SignalFlags>, // 可选的信号标志
-    }
-
-    // 定义工具栏按钮的动作类型
-    #[derive(Debug, Clone)]
-    enum ToolbarAction {
-        Signal(&'static str), // 发送信号
-        Toggle,               // 切换选中状态
-    }
 
     #[derive(Default)]
     pub struct MainToolbar {
         // 存储按钮引用，以便管理选中状态
         pub buttons: RefCell<Vec<ToggleButton>>,
     }
-
-    // 定义工具栏按钮配置表（包含信号定义）
-    static TOOLBAR_BUTTONS: Lazy<Vec<ToolbarButton>> = Lazy::new(|| {
-        vec![
-            ToolbarButton {
-                icon_name: "document-new-symbolic",
-                tooltip: "新建/AI聊天",
-                action: ToolbarAction::Signal("show-ai-chat"),
-                signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
-            },
-            ToolbarButton {
-                icon_name: "document-open-symbolic",
-                tooltip: "打开",
-                action: ToolbarAction::Toggle,
-                signal_flags: None,
-            },
-            ToolbarButton {
-                icon_name: "document-save-symbolic",
-                tooltip: "保存",
-                action: ToolbarAction::Toggle,
-                signal_flags: None,
-            },
-        ]
-    });
 
     #[glib::object_subclass]
     impl ObjectSubclass for MainToolbar {
@@ -73,21 +33,23 @@ mod imp {
     impl ObjectImpl for MainToolbar {
         fn signals() -> &'static [glib::subclass::Signal] {
             use once_cell::sync::Lazy;
-            
+
             static SIGNALS: Lazy<Vec<glib::subclass::Signal>> = Lazy::new(|| {
                 // 收集所有需要创建的信号
-                TOOLBAR_BUTTONS.iter()
-                    .filter_map(|button| {
-                        match &button.action {
-                            ToolbarAction::Signal(signal_name) => {
-                                let flags = button.signal_flags
-                                    .unwrap_or(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION);
-                                Some(glib::subclass::Signal::builder(signal_name)
+                TOOLBAR_BUTTONS
+                    .iter()
+                    .filter_map(|button| match &button.action {
+                        ToolbarAction::Signal(signal_name) => {
+                            let flags = button
+                                .signal_flags
+                                .unwrap_or(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION);
+                            Some(
+                                glib::subclass::Signal::builder(signal_name)
                                     .flags(flags)
-                                    .build())
-                            }
-                            _ => None,
+                                    .build(),
+                            )
                         }
+                        _ => None,
                     })
                     .collect()
             });
@@ -112,13 +74,13 @@ mod imp {
             let logo = gtk::Image::from_icon_name("applications-science-symbolic");
             logo.set_icon_size(gtk::IconSize::Normal);
             logo.set_tooltip_text(Some("Qtools"));
-            
+
             // 创建一个固定大小的容器来放置logo
             let logo_container = gtk::Box::new(Orientation::Horizontal, 0);
             logo_container.set_size_request(48, 48);
             logo_container.append(&logo);
             logo_container.set_css_classes(&["toolbar-logo-container"]);
-            
+
             sidebar_header.pack_start(&logo_container);
 
             sidebar_header.add_css_class("header-bar");
@@ -146,13 +108,24 @@ mod imp {
                         button.connect_clicked(clone!(
                             #[weak]
                             obj,
+                            #[weak]
+                            button,
                             move |_| {
+                                obj.imp().select_button(&button);
                                 obj.emit_by_name::<()>(signal_name, &[]);
                             }
                         ));
                     }
                     ToolbarAction::Toggle => {
-                        setup_button_click_handler(&button, buttons_ref.clone());
+                        button.connect_clicked(clone!(
+                            #[weak]
+                            obj,
+                            #[weak]
+                            button,
+                            move |_| {
+                                obj.imp().select_button(&button);
+                            }
+                        ));
                     }
                 }
 
@@ -184,24 +157,20 @@ mod imp {
             toolbar_view.add_top_bar(&sidebar_header);
             self.obj().set_child(Some(&toolbar_view));
         }
-    }
-
-    // 添加按钮点击处理器，用于切换选中状态
-    fn setup_button_click_handler(button: &ToggleButton, buttons: RefCell<Vec<ToggleButton>>) {
-        button.connect_clicked(clone!(
-            #[weak]
-            button,
-            move |_| {
-                for b in buttons.borrow().iter() {
-                    if b != &button {
-                        b.set_active(false);
+        // 统一处理按钮选择逻辑的公共方法
+        fn select_button(&self, selected_button: &ToggleButton) {
+            self.obj()
+                .imp()
+                .buttons
+                .borrow_mut()
+                .iter()
+                .for_each(|button| {
+                    if button != selected_button {
+                        button.set_active(false);
                     }
-                }
-
-                // 确保当前按钮被选中
-                button.set_active(true);
-            }
-        ));
+                });
+            selected_button.set_active(true);
+        }
     }
 
     // 创建工具栏按钮的辅助函数

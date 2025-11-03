@@ -3,6 +3,8 @@ mod content;
 pub mod menu;
 mod sidebar;
 mod toolbar;
+// 引入工具栏配置模块
+mod toolbar_config;
 
 use crate::app::QtoolsApplication;
 use adw::glib::Object;
@@ -14,6 +16,9 @@ use gtk::gio;
 use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 
 mod imp {
+    use crate::components::main_window::toolbar_config::{
+        ContentAction, ToolbarAction, TOOLBAR_BUTTONS,
+    };
     use crate::components::main_window::{content, toolbar};
     use adw::glib;
     use adw::glib::clone;
@@ -47,20 +52,31 @@ mod imp {
 
             let toolbar = toolbar::MainToolbar::new();
 
-            // 使用 glib::clone! 宏和 weak 引用来改写信号连接
-            toolbar.connect_local(
-                "show-ai-chat",
-                false,
-                clone!(
-                    #[weak]
-                    main_content,
-                    #[upgrade_or_panic]
-                    move |_| {
-                        main_content.show_ai_chat();
-                        None
-                    }
-                ),
-            );
+            // 根据配置表动态连接信号
+            for button_config in TOOLBAR_BUTTONS.iter() {
+                if let ToolbarAction::Signal(signal_name) = button_config.action {
+                    // 使用 glib::clone! 宏和 weak 引用来改写信号连接
+                    toolbar.connect_local(
+                        signal_name,
+                        false,
+                        clone!(
+                            #[weak]
+                            main_content,
+                            #[upgrade_or_panic]
+                            move |_| {
+                                // 根据 content_action 执行不同动作
+                                if let Some(content_action) = &button_config.content_action {
+                                    match content_action {
+                                        ContentAction::ShowAIChat => main_content.show_ai_chat(),
+                                        ContentAction::ShowWelcome => main_content.show_welcome(),
+                                    }
+                                }
+                                None
+                            }
+                        ),
+                    );
+                }
+            }
 
             // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
             let nav_view = adw::NavigationSplitView::builder()
