@@ -1,29 +1,31 @@
 use adw::glib::Object;
 use adw::subclass::prelude::ObjectSubclassIsExt;
 use adw::{glib, NavigationPage};
-use gtk::prelude::ButtonExt;
+use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 
 mod imp {
+    use crate::components::ai_chat::AIChat;
     use crate::components::main_window::menu::AppMenu;
     use crate::components::main_window::sidebar;
     use crate::components::welcome::WelcomePage;
     use adw::prelude::{BreakpointBinExt, NavigationPageExt, ToValue};
-    use adw::subclass::prelude::{
-        NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
-    };
+    use adw::subclass::prelude::*;
     use adw::{
         glib, Breakpoint, BreakpointCondition, BreakpointConditionLengthType, HeaderBar,
         LengthUnit, NavigationPage, ToolbarView,
     };
     use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
-    use gtk::{Label, Orientation};
+    use gtk::{Box, Label, Orientation};
     use std::cell::RefCell;
 
     #[derive(Default)]
     pub struct MainContent {
         pub sidebar_toggle_button: RefCell<Option<gtk::Button>>,
         pub breakpoint_bin: RefCell<Option<adw::BreakpointBin>>,
+        pub main_content_box: RefCell<Option<gtk::Box>>,
+        pub welcome_page: RefCell<Option<WelcomePage>>,
+        pub ai_chat_page: RefCell<Option<AIChat>>,
     }
 
     #[glib::object_subclass]
@@ -73,18 +75,29 @@ mod imp {
 
             let sidebar = sidebar::MainSidebar::new();
 
-            // 创建欢迎页面
+            // 创建欢迎页面和AI聊天页面
             let welcome_page = WelcomePage::new();
+            let ai_chat_page = AIChat::new();
+
+            // 保存页面引用
+            self.welcome_page.replace(Some(welcome_page.clone()));
+            self.ai_chat_page.replace(Some(ai_chat_page));
 
             // 创建主要内容区域
             let main_content = gtk::Box::builder()
                 .orientation(Orientation::Vertical)
                 .spacing(10)
                 .build();
+
+            // 保存主内容区域引用
+            self.main_content_box.replace(Some(main_content.clone()));
+
+            // 默认显示欢迎页面
             main_content.append(&welcome_page);
+
             // 为主要内容区域添加CSS类
             main_content.add_css_class("main-content");
-            //
+
             // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
             let overlay_view = adw::OverlaySplitView::builder()
                 .sidebar(&sidebar)
@@ -156,6 +169,38 @@ impl MainContent {
                     button_clone.set_icon_name("sidebar-show-symbolic");
                 }
             });
+        }
+    }
+
+    // 添加切换到AI聊天页面的方法
+    pub fn show_ai_chat(&self) {
+        if let (Some(main_content_box), Some(ai_chat_page)) = (
+            &*self.imp().main_content_box.borrow(),
+            &*self.imp().ai_chat_page.borrow()
+        ) {
+            // 清空当前内容
+            while let Some(child) = main_content_box.first_child() {
+                main_content_box.remove(&child);
+            }
+
+            // 添加AI聊天页面
+            main_content_box.append(&ai_chat_page.clone());
+        }
+    }
+
+    // 添加切换到欢迎页面的方法
+    pub fn show_welcome(&self) {
+        if let (Some(main_content_box), Some(welcome_page)) = (
+            &*self.imp().main_content_box.borrow(),
+            &*self.imp().welcome_page.borrow()
+        ) {
+            // 清空当前内容
+            while let Some(child) = main_content_box.first_child() {
+                main_content_box.remove(&child);
+            }
+
+            // 添加欢迎页面
+            main_content_box.append(&welcome_page.clone());
         }
     }
 }

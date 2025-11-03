@@ -46,6 +46,11 @@ mod imp {
 
             let toolbar = toolbar::MainToolbar::new();
 
+            let main_content_clone = main_content.clone();
+            toolbar.connect_show(move |_| {
+                main_content_clone.show_ai_chat();
+            });
+
             // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
             let nav_view = adw::NavigationSplitView::builder()
                 .sidebar(&toolbar)

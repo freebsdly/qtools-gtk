@@ -1,15 +1,14 @@
+use adw::glib;
 use adw::glib::Object;
 use adw::subclass::prelude::ObjectSubclassIsExt;
-use adw::{glib, NavigationPage};
+use adw::NavigationPage;
 
 mod imp {
     use super::*;
     use adw::glib::clone::Downgrade;
-    use adw::prelude::ButtonExt;
     use adw::prelude::NavigationPageExt;
-    use adw::subclass::prelude::{
-        NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
-    };
+    use adw::prelude::{ButtonExt, ObjectExt};
+    use adw::subclass::prelude::*;
     use adw::{glib, HeaderBar, ToolbarView};
     use gtk::prelude::{BoxExt, ToggleButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
@@ -57,13 +56,13 @@ mod imp {
                 .margin_bottom(0)
                 .build();
 
-            // 创建带图标大小的按钮
-            let new_button = create_toolbar_button("document-new-symbolic", "新建");
-            let open_button = create_toolbar_button("document-open-symbolic", "打开");
-            let save_button = create_toolbar_button("document-save-symbolic", "保存");
-
             let obj = self.obj();
             let buttons_ref = &obj.imp().buttons;
+
+            // 创建带图标大小的按钮
+            let new_button = create_toolbar_button("document-new-symbolic", "新建/AI聊天");
+            let open_button = create_toolbar_button("document-open-symbolic", "打开");
+            let save_button = create_toolbar_button("document-save-symbolic", "保存");
 
             // 存储按钮引用
             buttons_ref.borrow_mut().push(new_button.clone());
@@ -74,6 +73,13 @@ mod imp {
             setup_button_click_handler(&new_button, buttons_ref.clone());
             setup_button_click_handler(&open_button, buttons_ref.clone());
             setup_button_click_handler(&save_button, buttons_ref.clone());
+
+            // 为第一个按钮添加特殊的点击处理，用于切换到AI聊天
+            let obj_clone = obj.clone();
+            new_button.connect_clicked(move |_| {
+                // 发出信号通知需要显示AI聊天
+                obj_clone.emit_by_name::<()>("show-ai-chat", &[]);
+            });
 
             toolbar_box.append(&new_button);
             toolbar_box.append(&open_button);
@@ -108,7 +114,7 @@ mod imp {
 
     // 添加按钮点击处理器，用于切换选中状态
     fn setup_button_click_handler(button: &ToggleButton, buttons: RefCell<Vec<ToggleButton>>) {
-        let button_weak = button.downgrade();
+        let button_weak = Downgrade::downgrade(&button);
         button.connect_clicked(move |_| {
             if let Some(btn) = button_weak.upgrade() {
                 // 清除其他按钮的选中状态
