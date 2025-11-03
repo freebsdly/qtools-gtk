@@ -5,6 +5,16 @@
     max-height: 48px;
 }
 
+.main-toolbar {
+    margin: 0;
+    padding: 0;
+}
+
+.main-toolbar > .toolbar-box {
+    margin: 0;
+    padding: 0;
+}
+
 .main-content {
     margin: 20px;
     padding: 10px;
@@ -17,14 +27,6 @@
     padding: 10px;
     /*background-color: #f0f0f0;*/
     border-radius: 8px;
-}
-
-
-.main-toolbar {
-    min-width: 48px;
-    max-width: 48px;
-    padding: 0;
-    margin: 0;
 }
 
 .toolbar-button {
@@ -56,18 +58,6 @@
     justify-content: center;
 }
 
-.main-toolbar > box {
-    padding: 0;
-    margin: 0;
-    spacing: 0;
-}
-
-box.main-toolbar {
-    padding: 0;
-    margin: 0;
-    spacing: 0;
-}
-
 .toolbar-button:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     background-color: rgba(0, 0, 0, 0.05);
@@ -81,9 +71,6 @@ box.main-toolbar {
     background-color: rgba(0, 0, 0, 0.15);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) inset;
 }
-
-/* GTK不支持@media查询，深色主题由系统自动处理 */
-/* 您可以在应用中通过Adw.StyleManager手动控制主题 */
 
 /* 欢迎页面样式 */
 .title-1 {
@@ -105,4 +92,36 @@ box.main-toolbar {
     margin: 10px;
     padding: 10px;
     border-radius: 8px;
+}
+
+@media (min-width: 3840px) {
+    .main-toolbar {
+        min-width: 48px;
+        max-width: 48px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .header-bar {
+        /* #cfcfcf replace @borders */
+        border-bottom: 1px solid #cfcfcf;
+        min-height: 48px;
+        max-height: 48px;
+    }
+}
+
+@media (min-width: 2560px) {
+    .main-toolbar {
+        min-width: 32px;
+        max-width: 32px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .header-bar {
+        /* #cfcfcf replace @borders */
+        border-bottom: 1px solid #cfcfcf;
+        min-height: 32px;
+        max-height: 32px;
+    }
 }

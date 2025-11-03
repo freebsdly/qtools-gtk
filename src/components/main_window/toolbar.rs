@@ -1,16 +1,16 @@
+use adw::NavigationPage;
 use adw::glib;
 use adw::glib::Object;
 use adw::subclass::prelude::ObjectSubclassIsExt;
-use adw::NavigationPage;
 
 mod imp {
     use super::*;
-    use crate::components::main_window::toolbar_config::{ToolbarAction, TOOLBAR_BUTTONS};
+    use crate::components::main_window::toolbar_config::{TOOLBAR_BUTTONS, ToolbarAction};
     use adw::glib::clone;
     use adw::prelude::NavigationPageExt;
     use adw::prelude::{ButtonExt, ObjectExt};
     use adw::subclass::prelude::*;
-    use adw::{glib, HeaderBar, ToolbarView};
+    use adw::{HeaderBar, ToolbarView, glib};
     use gtk::prelude::{BoxExt, ToggleButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation, PolicyType, ScrolledWindow, ToggleButton};
@@ -65,7 +65,7 @@ mod imp {
     impl MainToolbar {
         fn create_toolbar(&self) {
             // 创建侧边栏标题栏
-            let sidebar_header = HeaderBar::builder()
+            let toolbar_header = HeaderBar::builder()
                 .title_widget(&Label::new(Some("")))
                 .show_end_title_buttons(true)
                 .build();
@@ -83,17 +83,14 @@ mod imp {
             //
             // sidebar_header.pack_start(&logo_container);
 
-            sidebar_header.add_css_class("header-bar");
+            toolbar_header.add_css_class("header-bar");
 
             // 创建工具栏按钮容器
             let toolbar_box = gtk::Box::builder()
                 .orientation(Orientation::Vertical)
-                .spacing(0)
-                .margin_start(0)
-                .margin_end(0)
-                .margin_top(0)
-                .margin_bottom(0)
                 .build();
+
+            toolbar_box.add_css_class("toolbar-box");
 
             let obj = self.obj();
             let buttons_ref = &obj.imp().buttons;
@@ -133,28 +130,28 @@ mod imp {
             }
 
             // 创建侧边栏内容
-            let sidebar_content = gtk::Box::builder()
+            let toolbar_content = gtk::Box::builder()
                 .orientation(Orientation::Vertical)
                 .spacing(0)
                 .build();
 
             // 添加工具栏到侧边栏内容顶部
-            sidebar_content.append(&toolbar_box);
+            toolbar_content.append(&toolbar_box);
 
             // 为侧边栏内容添加CSS类
-            sidebar_content.add_css_class("main-toolbar");
+            toolbar_content.add_css_class("main-toolbar");
 
             // 将侧边栏内容放入滚动视图中
-            let sidebar_scroll = ScrolledWindow::builder()
+            let toolbar_scroll = ScrolledWindow::builder()
                 .vexpand(true)
                 .hscrollbar_policy(PolicyType::Never)
-                .child(&sidebar_content)
+                .child(&toolbar_content)
                 .build();
 
             // 创建工具栏视图
-            let toolbar_view = ToolbarView::builder().content(&sidebar_scroll).build();
+            let toolbar_view = ToolbarView::builder().content(&toolbar_scroll).build();
 
-            toolbar_view.add_top_bar(&sidebar_header);
+            toolbar_view.add_top_bar(&toolbar_header);
             self.obj().set_child(Some(&toolbar_view));
         }
         // 统一处理按钮选择逻辑的公共方法

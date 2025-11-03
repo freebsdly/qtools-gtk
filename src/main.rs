@@ -7,7 +7,7 @@ use adw::prelude::*;
 use app::QtoolsApplication;
 use components::tutorial::TutorialDialog;
 use gtk::glib;
-use gtk::{gdk, CssProvider};
+use gtk::{CssProvider, gdk};
 
 const APP_ID: &str = "top.qinhuajun.app";
 
