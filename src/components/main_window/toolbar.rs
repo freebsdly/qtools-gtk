@@ -70,18 +70,18 @@ mod imp {
                 .show_end_title_buttons(true)
                 .build();
 
-            // 创建logo图像
-            let logo = gtk::Image::from_icon_name("applications-science-symbolic");
-            logo.set_icon_size(gtk::IconSize::Normal);
-            logo.set_tooltip_text(Some("Qtools"));
-
-            // 创建一个固定大小的容器来放置logo
-            let logo_container = gtk::Box::new(Orientation::Horizontal, 0);
-            logo_container.set_size_request(48, 48);
-            logo_container.append(&logo);
-            logo_container.set_css_classes(&["toolbar-logo-container"]);
-
-            sidebar_header.pack_start(&logo_container);
+            // // 创建logo图像
+            // let logo = gtk::Image::from_icon_name("applications-science-symbolic");
+            // logo.set_icon_size(gtk::IconSize::Normal);
+            // logo.set_tooltip_text(Some("Qtools"));
+            //
+            // // 创建一个固定大小的容器来放置logo
+            // let logo_container = gtk::Box::new(Orientation::Horizontal, 0);
+            // logo_container.set_size_request(48, 48);
+            // logo_container.append(&logo);
+            // logo_container.set_css_classes(&["toolbar-logo-container"]);
+            //
+            // sidebar_header.pack_start(&logo_container);
 
             sidebar_header.add_css_class("header-bar");
 
