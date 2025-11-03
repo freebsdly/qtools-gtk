@@ -16,7 +16,7 @@ mod imp {
     };
     use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
-    use gtk::{Box, Label, Orientation};
+    use gtk::{Label, Orientation};
     use std::cell::RefCell;
 
     #[derive(Default)]

@@ -5,7 +5,7 @@ use adw::NavigationPage;
 
 mod imp {
     use super::*;
-    use adw::glib::clone::Downgrade;
+    use adw::glib::clone;
     use adw::prelude::NavigationPageExt;
     use adw::prelude::{ButtonExt, ObjectExt};
     use adw::subclass::prelude::*;
@@ -14,6 +14,21 @@ mod imp {
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation, PolicyType, ScrolledWindow, ToggleButton};
     use std::cell::RefCell;
+
+    // 定义工具栏按钮的结构体
+    #[derive(Debug, Clone)]
+    struct ToolbarButton {
+        icon_name: &'static str,
+        tooltip: &'static str,
+        action: ToolbarAction,
+    }
+
+    // 定义工具栏按钮的动作类型
+    #[derive(Debug, Clone)]
+    enum ToolbarAction {
+        Signal(&'static str),  // 发送信号
+        Toggle,                // 切换选中状态
+    }
 
     #[derive(Default)]
     pub struct MainToolbar {
@@ -30,6 +45,18 @@ mod imp {
 
     // Trait shared by all GObjects
     impl ObjectImpl for MainToolbar {
+        fn signals() -> &'static [glib::subclass::Signal] {
+            use once_cell::sync::Lazy;
+            static SIGNALS: Lazy<Vec<glib::subclass::Signal>> = Lazy::new(|| {
+                vec![
+                    glib::subclass::Signal::builder("show-ai-chat")
+                        .flags(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION)
+                        .build(),
+                ]
+            });
+            SIGNALS.as_ref()
+        }
+
         fn constructed(&self) {
             self.parent_constructed();
             self.create_toolbar();
@@ -59,31 +86,44 @@ mod imp {
             let obj = self.obj();
             let buttons_ref = &obj.imp().buttons;
 
-            // 创建带图标大小的按钮
-            let new_button = create_toolbar_button("document-new-symbolic", "新建/AI聊天");
-            let open_button = create_toolbar_button("document-open-symbolic", "打开");
-            let save_button = create_toolbar_button("document-save-symbolic", "保存");
+            // 定义工具栏按钮配置表
+            let toolbar_buttons = vec![
+                ToolbarButton {
+                    icon_name: "document-new-symbolic",
+                    tooltip: "新建/AI聊天",
+                    action: ToolbarAction::Signal("show-ai-chat"),
+                },
+                ToolbarButton {
+                    icon_name: "document-open-symbolic",
+                    tooltip: "打开",
+                    action: ToolbarAction::Toggle,
+                },
+                ToolbarButton {
+                    icon_name: "document-save-symbolic",
+                    tooltip: "保存",
+                    action: ToolbarAction::Toggle,
+                },
+            ];
 
-            // 存储按钮引用
-            buttons_ref.borrow_mut().push(new_button.clone());
-            buttons_ref.borrow_mut().push(open_button.clone());
-            buttons_ref.borrow_mut().push(save_button.clone());
+            // 根据配置表动态创建按钮
+            for button_config in toolbar_buttons {
+                let button = create_toolbar_button(button_config.icon_name, button_config.tooltip);
+                buttons_ref.borrow_mut().push(button.clone());
 
-            // 添加按钮点击事件处理，实现选中效果
-            setup_button_click_handler(&new_button, buttons_ref.clone());
-            setup_button_click_handler(&open_button, buttons_ref.clone());
-            setup_button_click_handler(&save_button, buttons_ref.clone());
+                match button_config.action {
+                    ToolbarAction::Signal(signal_name) => {
+                        let obj_clone = obj.clone();
+                        button.connect_clicked(move |_| {
+                            obj_clone.emit_by_name::<()>(signal_name, &[]);
+                        });
+                    }
+                    ToolbarAction::Toggle => {
+                        setup_button_click_handler(&button, buttons_ref.clone());
+                    }
+                }
 
-            // 为第一个按钮添加特殊的点击处理，用于切换到AI聊天
-            let obj_clone = obj.clone();
-            new_button.connect_clicked(move |_| {
-                // 发出信号通知需要显示AI聊天
-                obj_clone.emit_by_name::<()>("show-ai-chat", &[]);
-            });
-
-            toolbar_box.append(&new_button);
-            toolbar_box.append(&open_button);
-            toolbar_box.append(&save_button);
+                toolbar_box.append(&button);
+            }
 
             // 创建侧边栏内容
             let sidebar_content = gtk::Box::builder()
@@ -114,20 +154,20 @@ mod imp {
 
     // 添加按钮点击处理器，用于切换选中状态
     fn setup_button_click_handler(button: &ToggleButton, buttons: RefCell<Vec<ToggleButton>>) {
-        let button_weak = Downgrade::downgrade(&button);
-        button.connect_clicked(move |_| {
-            if let Some(btn) = button_weak.upgrade() {
-                // 清除其他按钮的选中状态
+        button.connect_clicked(clone!(
+            #[weak]
+            button,
+            move |_| {
                 for b in buttons.borrow().iter() {
-                    if b != &btn {
+                    if b != &button {
                         b.set_active(false);
                     }
                 }
 
                 // 确保当前按钮被选中
-                btn.set_active(true);
+                button.set_active(true);
             }
-        });
+        ));
     }
 
     // 创建工具栏按钮的辅助函数

@@ -16,7 +16,8 @@ use gtk::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
 mod imp {
     use crate::components::main_window::{content, toolbar};
     use adw::glib;
-    use adw::prelude::AdwApplicationWindowExt;
+    use adw::glib::clone;
+    use adw::prelude::{AdwApplicationWindowExt, ObjectExt};
     use adw::subclass::prelude::{
         AdwApplicationWindowImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
@@ -46,10 +47,20 @@ mod imp {
 
             let toolbar = toolbar::MainToolbar::new();
 
-            let main_content_clone = main_content.clone();
-            toolbar.connect_show(move |_| {
-                main_content_clone.show_ai_chat();
-            });
+            // 使用 glib::clone! 宏和 weak 引用来改写信号连接
+            toolbar.connect_local(
+                "show-ai-chat",
+                false,
+                clone!(
+                    #[weak]
+                    main_content,
+                    #[upgrade_or_panic]
+                    move |_| {
+                        main_content.show_ai_chat();
+                        None
+                    }
+                ),
+            );
 
             // 创建分割视图（带侧边栏）- 使用 AdwOverlaySplitView 实现可折叠侧边栏
             let nav_view = adw::NavigationSplitView::builder()
