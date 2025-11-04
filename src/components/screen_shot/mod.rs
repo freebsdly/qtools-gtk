@@ -1,5 +1,5 @@
 use adw::glib::Object;
-use adw::{glib, NavigationPage};
+use adw::{NavigationPage, glib};
 
 mod imp {
     use super::*;
@@ -16,9 +16,7 @@ mod imp {
     use std::rc::Rc;
 
     #[derive(Default)]
-    pub struct ScreenShot {
-        drawing_area: RefCell<Option<DrawingArea>>,
-    }
+    pub struct ScreenShot {}
 
     #[glib::object_subclass]
     impl ObjectSubclass for ScreenShot {
@@ -75,33 +73,29 @@ mod imp {
                 .content_height(height as i32)
                 .build();
 
-            self.drawing_area.replace(Some(drawing_area.clone()));
-
             // 克隆引用用于闭包
 
             let image_data_clone = image_data.clone();
 
-            self.drawing_area.borrow().as_ref().unwrap().set_draw_func(
-                move |_da, cr, width, height| {
-                    if let Some(data) = &*image_data_clone.borrow() {
-                        // 创建 Cairo ImageSurface（ARGB32格式，每个像素4字节）
-                        let surface = cairo::ImageSurface::create_for_data(
-                            data.clone(),
-                            cairo::Format::ARgb32, // 使用Argb32格式
-                            width,
-                            height,
-                            width * 4, // 步长为width * 4，因为每个像素4字节
-                        )
-                        .expect("Failed to create image surface");
+            drawing_area.set_draw_func(move |_da, cr, _width, _height| {
+                if let Some(data) = &*image_data_clone.borrow() {
+                    // 使用固定的宽高值创建 Cairo ImageSurface（ARGB32格式，每个像素4字节）
+                    let surface = cairo::ImageSurface::create_for_data(
+                        data.clone(),
+                        cairo::Format::ARgb32,     // 使用Argb32格式
+                        width.try_into().unwrap(), // 固定宽度
+                        height as i32,             // 固定高度
+                        width as i32 * 4,          // 步长为width * 4，因为每个像素4字节
+                    )
+                    .expect("Failed to create image surface");
 
-                        // 将表面绘制到 Cairo 上下文
+                    // 将表面绘制到 Cairo 上下文
 
-                        cr.set_source_surface(&surface, 0.0, 0.0).unwrap();
+                    cr.set_source_surface(&surface, 0.0, 0.0).unwrap();
 
-                        cr.paint().unwrap();
-                    }
-                },
-            );
+                    cr.paint().unwrap();
+                }
+            });
             content_box.append(&drawing_area);
             self.obj().set_child(Some(&content_box))
         }
@@ -119,7 +113,9 @@ glib::wrapper! {
 
 impl ScreenShot {
     pub fn new() -> Self {
-        Object::builder().build()
+        Object::builder()
+            .property("title", "Screenshot")
+            .build()
     }
 
     pub fn take_screenshot(&self) {

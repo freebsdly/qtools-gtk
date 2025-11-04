@@ -196,6 +196,8 @@ glib::wrapper! {
 
 impl MainToolbar {
     pub fn new() -> Self {
-        Object::builder().build()
+        Object::builder()
+            .property("title", "Toolbar")
+            .build()
     }
 }

@@ -66,6 +66,8 @@ glib::wrapper! {
 
 impl MainSidebar {
     pub fn new() -> Self {
-        Object::builder().build()
+        Object::builder()
+            .property("title", "Sidebar")
+            .build()
     }
 }

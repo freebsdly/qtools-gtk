@@ -70,7 +70,10 @@ mod imp {
             content_header.add_css_class("header-bar");
 
             // 创建 BreakpointBin 容器
-            let breakpoint_bin = adw::BreakpointBin::builder().build();
+            let breakpoint_bin = adw::BreakpointBin::builder()
+                .width_request(360)   // 设置最小宽度
+                .height_request(240)  // 设置最小高度
+                .build();
 
             // 保存 breakpoint_bin 的引用
             self.breakpoint_bin.replace(Some(breakpoint_bin.clone()));
@@ -155,7 +158,9 @@ glib::wrapper! {
 
 impl MainContent {
     pub fn new() -> Self {
-        Object::builder().build()
+        Object::builder()
+            .property("title", "Main Content")
+            .build()
     }
 
     // 设置侧边栏切换按钮的点击事件处理器

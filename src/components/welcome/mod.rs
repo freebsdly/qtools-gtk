@@ -239,6 +239,8 @@ glib::wrapper! {
 
 impl Welcome {
     pub fn new() -> Self {
-        Object::builder().build()
+        Object::builder()
+            .property("title", "Welcome")
+            .build()
     }
 }
