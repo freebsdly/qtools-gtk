@@ -1,6 +1,6 @@
 use adw::glib::Object;
 use adw::prelude::{ActionMapExt, AdwDialogExt, AlertDialogExt, AlertDialogExtManual};
-use adw::{AboutDialog, gio, glib};
+use adw::{gio, glib, AboutDialog};
 use gtk::prelude::{ApplicationExt, GtkApplicationExt};
 
 mod imp {
@@ -127,4 +127,6 @@ impl QtoolsApplication {
 
         self.set_accels_for_action("app.quit", &["<Ctrl>q"]);
     }
+
+    pub fn extra_actions(&self) {}
 }

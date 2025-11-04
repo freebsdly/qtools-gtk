@@ -7,7 +7,8 @@ mod imp {
     use crate::components::ai_chat::AIChat;
     use crate::components::main_window::menu::AppMenu;
     use crate::components::main_window::sidebar;
-    use crate::components::welcome::WelcomePage;
+    use crate::components::screen_shot::ScreenShot;
+    use crate::components::welcome::Welcome;
     use adw::prelude::{BreakpointBinExt, NavigationPageExt, ToValue};
     use adw::subclass::prelude::*;
     use adw::{
@@ -24,8 +25,9 @@ mod imp {
         pub sidebar_toggle_button: RefCell<Option<gtk::Button>>,
         pub breakpoint_bin: RefCell<Option<adw::BreakpointBin>>,
         pub main_content_box: RefCell<Option<gtk::Box>>,
-        pub welcome_page: RefCell<Option<WelcomePage>>,
+        pub welcome_page: RefCell<Option<Welcome>>,
         pub ai_chat_page: RefCell<Option<AIChat>>,
+        pub screen_shot_page: RefCell<Option<ScreenShot>>,
     }
 
     #[glib::object_subclass]
@@ -76,12 +78,14 @@ mod imp {
             let sidebar = sidebar::MainSidebar::new();
 
             // 创建欢迎页面和AI聊天页面
-            let welcome_page = WelcomePage::new();
+            let welcome_page = Welcome::new();
             let ai_chat_page = AIChat::new();
+            let screen_shot_page = ScreenShot::new();
 
             // 保存页面引用
             self.welcome_page.replace(Some(welcome_page.clone()));
             self.ai_chat_page.replace(Some(ai_chat_page));
+            self.screen_shot_page.replace(Some(screen_shot_page));
 
             // 创建主要内容区域
             let main_content = gtk::Box::builder()
@@ -176,7 +180,7 @@ impl MainContent {
     pub fn show_ai_chat(&self) {
         if let (Some(main_content_box), Some(ai_chat_page)) = (
             &*self.imp().main_content_box.borrow(),
-            &*self.imp().ai_chat_page.borrow()
+            &*self.imp().ai_chat_page.borrow(),
         ) {
             // 清空当前内容
             while let Some(child) = main_content_box.first_child() {
@@ -192,7 +196,7 @@ impl MainContent {
     pub fn show_welcome(&self) {
         if let (Some(main_content_box), Some(welcome_page)) = (
             &*self.imp().main_content_box.borrow(),
-            &*self.imp().welcome_page.borrow()
+            &*self.imp().welcome_page.borrow(),
         ) {
             // 清空当前内容
             while let Some(child) = main_content_box.first_child() {
@@ -201,6 +205,21 @@ impl MainContent {
 
             // 添加欢迎页面
             main_content_box.append(&welcome_page.clone());
+        }
+    }
+
+    pub fn show_screen_shot(&self) {
+        if let (Some(main_content_box), Some(screen_shot_page)) = (
+            &*self.imp().main_content_box.borrow(),
+            &*self.imp().screen_shot_page.borrow(),
+        ) {
+            // 清空当前内容
+            while let Some(child) = main_content_box.first_child() {
+                main_content_box.remove(&child);
+            }
+
+            // 添加欢迎页面
+            main_content_box.append(&screen_shot_page.clone());
         }
     }
 }

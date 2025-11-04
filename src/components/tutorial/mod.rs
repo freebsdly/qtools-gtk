@@ -1,5 +1,4 @@
 use adw::glib::Object;
-use adw::prelude::{AdwDialogExt, GtkWindowExt};
 use adw::{glib, Dialog};
 use gtk::prelude::*;
 
@@ -23,12 +22,12 @@ mod imp {
     impl ObjectImpl for TutorialDialog {
         fn constructed(&self) {
             self.parent_constructed();
-            self.create_tutorial_dialog();
+            self.build_ui();
         }
     }
 
     impl TutorialDialog {
-        fn create_tutorial_dialog(&self) {
+        fn build_ui(&self) {
             let obj = self.obj();
             obj.set_content_width(600);
             obj.set_content_height(500);

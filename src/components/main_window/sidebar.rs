@@ -26,12 +26,12 @@ mod imp {
     impl ObjectImpl for MainSidebar {
         fn constructed(&self) {
             self.parent_constructed();
-            self.create_sidebar();
+            self.build_ui();
         }
     }
 
     impl MainSidebar {
-        fn create_sidebar(&self) {
+        fn build_ui(&self) {
             // 创建侧边栏内容
             let sidebar_content = gtk::Box::builder()
                 .orientation(Orientation::Vertical)

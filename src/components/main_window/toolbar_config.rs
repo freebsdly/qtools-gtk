@@ -37,7 +37,8 @@ pub enum ContentAction {
     ShowAIChat,
     /// 显示欢迎页面
     ShowWelcome,
-    // 可以继续添加其他动作
+    /// 截图
+    ScreenShot,
 }
 
 /// 工具栏按钮配置表
@@ -52,9 +53,9 @@ pub static TOOLBAR_BUTTONS: Lazy<Vec<ToolbarButton>> = Lazy::new(|| {
         },
         ToolbarButton {
             icon_name: "document-open-symbolic",
-            tooltip: "打开",
+            tooltip: "截图工具",
             action: ToolbarAction::Signal("show-welcome"),
-            content_action: Some(ContentAction::ShowWelcome),
+            content_action: Some(ContentAction::ScreenShot),
             signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
         },
         ToolbarButton {

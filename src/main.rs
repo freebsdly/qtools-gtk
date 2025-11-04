@@ -7,7 +7,7 @@ use adw::prelude::*;
 use app::QtoolsApplication;
 use components::tutorial::TutorialDialog;
 use gtk::glib;
-use gtk::{CssProvider, gdk};
+use gtk::{gdk, CssProvider};
 
 const APP_ID: &str = "top.qinhuajun.app";
 
@@ -19,7 +19,9 @@ fn main() -> glib::ExitCode {
     // Connect to signals
     app.connect_startup(|app| {
         load_css();
+        app.extra_actions();
     });
+
     app.connect_activate(|app| {
         // 创建并显示引导页
         let tutorial_dialog = TutorialDialog::new();

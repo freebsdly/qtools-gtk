@@ -25,12 +25,12 @@ mod imp {
     impl ObjectImpl for AppMenu {
         fn constructed(&self) {
             self.parent_constructed();
-            self.create_menu();
+            self.build_ui();
         }
     }
 
     impl AppMenu {
-        fn create_menu(&self) {
+        fn build_ui(&self) {
             // 创建菜单模型
             let menu_model = gio::Menu::new();
 

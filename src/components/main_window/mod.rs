@@ -42,12 +42,12 @@ mod imp {
     impl ObjectImpl for MainWindow {
         fn constructed(&self) {
             self.parent_constructed();
-            self.create_main_window();
+            self.build_ui();
         }
     }
 
     impl MainWindow {
-        fn create_main_window(&self) {
+        fn build_ui(&self) {
             let main_content = content::MainContent::new();
 
             let toolbar = toolbar::MainToolbar::new();
@@ -74,6 +74,9 @@ mod imp {
                                             ContentAction::ShowWelcome => {
                                                 main_content.show_welcome()
                                             }
+                                            ContentAction::ScreenShot => {
+                                                main_content.show_screen_shot()
+                                            }
                                         }
                                     }
                                     None
@@ -83,6 +86,7 @@ mod imp {
                     }
                     ToolbarAction::Toggle => {
                         // Toggle 类型按钮不需要连接信号
+                        todo!()
                     }
                 }
             }
@@ -148,7 +152,6 @@ impl MainWindow {
         filters.append(&filter);
         dialog.set_filters(Some(&filters));
 
-        let window = self.clone();
         dialog.save(Some(self), None::<&gio::Cancellable>, move |result| {
             if let Ok(file) = result {
                 println!("创建新文件: {:?}", file.path());
@@ -173,7 +176,6 @@ impl MainWindow {
         filters.append(&filter);
         dialog.set_filters(Some(&filters));
 
-        let window = self.clone();
         dialog.open(Some(self), None::<&gio::Cancellable>, move |result| {
             if let Ok(file) = result {
                 println!("打开文件: {:?}", file.path());

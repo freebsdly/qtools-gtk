@@ -1,16 +1,16 @@
-use adw::NavigationPage;
 use adw::glib;
 use adw::glib::Object;
 use adw::subclass::prelude::ObjectSubclassIsExt;
+use adw::NavigationPage;
 
 mod imp {
     use super::*;
-    use crate::components::main_window::toolbar_config::{TOOLBAR_BUTTONS, ToolbarAction};
+    use crate::components::main_window::toolbar_config::{ToolbarAction, TOOLBAR_BUTTONS};
     use adw::glib::clone;
     use adw::prelude::NavigationPageExt;
     use adw::prelude::{ButtonExt, ObjectExt};
     use adw::subclass::prelude::*;
-    use adw::{HeaderBar, ToolbarView, glib};
+    use adw::{glib, HeaderBar, ToolbarView};
     use gtk::prelude::{BoxExt, ToggleButtonExt, WidgetExt};
     use gtk::subclass::prelude::WidgetImpl;
     use gtk::{Label, Orientation, PolicyType, ScrolledWindow, ToggleButton};
@@ -58,12 +58,12 @@ mod imp {
 
         fn constructed(&self) {
             self.parent_constructed();
-            self.create_toolbar();
+            self.build_ui();
         }
     }
 
     impl MainToolbar {
-        fn create_toolbar(&self) {
+        fn build_ui(&self) {
             // 创建侧边栏标题栏
             let toolbar_header = HeaderBar::builder()
                 .title_widget(&Label::new(Some("")))

@@ -3,7 +3,7 @@ use adw::{glib, NavigationPage};
 
 mod imp {
     use super::*;
-    use adw::prelude::{BoxExt, NavigationPageExt, WidgetExt};
+    use adw::prelude::{BoxExt, NavigationPageExt};
     use adw::subclass::prelude::{
         NavigationPageImpl, ObjectImpl, ObjectImplExt, ObjectSubclass, ObjectSubclassExt,
     };
@@ -11,23 +11,23 @@ mod imp {
     use gtk::{Box, Label, Orientation};
 
     #[derive(Default)]
-    pub struct WelcomePage {}
+    pub struct Welcome {}
 
     #[glib::object_subclass]
-    impl ObjectSubclass for WelcomePage {
-        const NAME: &'static str = "QtoolsWelcomePage";
-        type Type = super::WelcomePage;
+    impl ObjectSubclass for Welcome {
+        const NAME: &'static str = "QtoolsWelcome";
+        type Type = super::Welcome;
         type ParentType = NavigationPage;
     }
 
-    impl ObjectImpl for WelcomePage {
+    impl ObjectImpl for Welcome {
         fn constructed(&self) {
             self.parent_constructed();
             self.create_welcome_page();
         }
     }
 
-    impl WelcomePage {
+    impl Welcome {
         fn create_welcome_page(&self) {
             // 创建欢迎页面的主要内容容器
             let welcome_box = Box::builder()
@@ -116,7 +116,7 @@ mod imp {
         }
 
         fn create_carousel(&self) -> gtk::Box {
-            let carousel_box = gtk::Box::builder()
+            let carousel_box = Box::builder()
                 .orientation(Orientation::Vertical)
                 .spacing(12)
                 .vexpand(true)
@@ -227,17 +227,17 @@ mod imp {
         }
     }
 
-    impl WidgetImpl for WelcomePage {}
-    impl NavigationPageImpl for WelcomePage {}
+    impl WidgetImpl for Welcome {}
+    impl NavigationPageImpl for Welcome {}
 }
 
 glib::wrapper! {
-    pub struct WelcomePage(ObjectSubclass<imp::WelcomePage>)
+    pub struct Welcome(ObjectSubclass<imp::Welcome>)
         @extends NavigationPage, gtk::Widget,
         @implements gtk::Accessible, gtk::Actionable, gtk::Buildable, gtk::ConstraintTarget;
 }
 
-impl WelcomePage {
+impl Welcome {
     pub fn new() -> Self {
         Object::builder().build()
     }
