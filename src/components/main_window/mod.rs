@@ -77,6 +77,9 @@ mod imp {
                                             ContentAction::ScreenShot => {
                                                 main_content.show_screen_shot()
                                             }
+                                            ContentAction::EntityList => {
+                                                main_content.show_entity_list()
+                                            }
                                         }
                                     }
                                     None

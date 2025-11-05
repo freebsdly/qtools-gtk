@@ -5,6 +5,7 @@ use gtk::prelude::{BoxExt, ButtonExt, WidgetExt};
 
 mod imp {
     use crate::components::ai_chat::AIChat;
+    use crate::components::entity_list::EntityList;
     use crate::components::main_window::menu::AppMenu;
     use crate::components::main_window::sidebar;
     use crate::components::screen_shot::ScreenShot;
@@ -28,6 +29,7 @@ mod imp {
         pub welcome_page: RefCell<Option<Welcome>>,
         pub ai_chat_page: RefCell<Option<AIChat>>,
         pub screen_shot_page: RefCell<Option<ScreenShot>>,
+        pub entity_list_page: RefCell<Option<EntityList>>,
     }
 
     #[glib::object_subclass]
@@ -40,12 +42,12 @@ mod imp {
     impl ObjectImpl for MainContent {
         fn constructed(&self) {
             self.parent_constructed();
-            self.create_content();
+            self.build_ui();
         }
     }
 
     impl MainContent {
-        fn create_content(&self) {
+        fn build_ui(&self) {
             // 创建菜单
             let app_menu = AppMenu::new();
 
@@ -71,8 +73,8 @@ mod imp {
 
             // 创建 BreakpointBin 容器
             let breakpoint_bin = adw::BreakpointBin::builder()
-                .width_request(360)   // 设置最小宽度
-                .height_request(240)  // 设置最小高度
+                .width_request(360) // 设置最小宽度
+                .height_request(240) // 设置最小高度
                 .build();
 
             // 保存 breakpoint_bin 的引用
@@ -84,11 +86,13 @@ mod imp {
             let welcome_page = Welcome::new();
             let ai_chat_page = AIChat::new();
             let screen_shot_page = ScreenShot::new();
+            let entity_list_page = EntityList::new();
 
             // 保存页面引用
             self.welcome_page.replace(Some(welcome_page.clone()));
             self.ai_chat_page.replace(Some(ai_chat_page));
             self.screen_shot_page.replace(Some(screen_shot_page));
+            self.entity_list_page.replace(Some(entity_list_page));
 
             // 创建主要内容区域
             let main_content = gtk::Box::builder()
@@ -158,9 +162,7 @@ glib::wrapper! {
 
 impl MainContent {
     pub fn new() -> Self {
-        Object::builder()
-            .property("title", "Main Content")
-            .build()
+        Object::builder().property("title", "Main Content").build()
     }
 
     // 设置侧边栏切换按钮的点击事件处理器
@@ -225,6 +227,22 @@ impl MainContent {
 
             // 添加欢迎页面
             main_content_box.append(&screen_shot_page.clone());
+        }
+    }
+
+    // 添加切换到欢迎页面的方法
+    pub fn show_entity_list(&self) {
+        if let (Some(main_content_box), Some(entity_list_page)) = (
+            &*self.imp().main_content_box.borrow(),
+            &*self.imp().entity_list_page.borrow(),
+        ) {
+            // 清空当前内容
+            while let Some(child) = main_content_box.first_child() {
+                main_content_box.remove(&child);
+            }
+
+            // 添加欢迎页面
+            main_content_box.append(&entity_list_page.clone());
         }
     }
 }

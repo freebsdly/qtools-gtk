@@ -39,6 +39,8 @@ pub enum ContentAction {
     ShowWelcome,
     /// 截图
     ScreenShot,
+    ///
+    EntityList,
 }
 
 /// 工具栏按钮配置表
@@ -54,15 +56,22 @@ pub static TOOLBAR_BUTTONS: Lazy<Vec<ToolbarButton>> = Lazy::new(|| {
         ToolbarButton {
             icon_name: "document-open-symbolic",
             tooltip: "截图工具",
-            action: ToolbarAction::Signal("show-welcome"),
+            action: ToolbarAction::Signal("show-screen-shot"),
             content_action: Some(ContentAction::ScreenShot),
             signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
         },
         ToolbarButton {
             icon_name: "document-save-symbolic",
             tooltip: "保存",
-            action: ToolbarAction::Signal("show-welcome-save"),
+            action: ToolbarAction::Signal("show-welcome"),
             content_action: Some(ContentAction::ShowWelcome),
+            signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
+        },
+        ToolbarButton {
+            icon_name: "document-save-symbolic",
+            tooltip: "保存",
+            action: ToolbarAction::Signal("show-entity-list"),
+            content_action: Some(ContentAction::EntityList),
             signal_flags: Some(glib::SignalFlags::RUN_LAST | glib::SignalFlags::ACTION),
         },
     ]
